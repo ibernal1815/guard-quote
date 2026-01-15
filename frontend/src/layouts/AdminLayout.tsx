@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { path: "/admin/quotes", label: "Quotes", icon: "📋" },
   { path: "/admin/clients", label: "Clients", icon: "👥" },
   { path: "/admin/users", label: "Users", icon: "🔐" },
+  { path: "/admin/services", label: "Services", icon: "🖥️" },
   { path: "/admin/analytics", label: "Analytics", icon: "📈" },
   { path: "/admin/settings", label: "Settings", icon: "⚙️" },
 ];

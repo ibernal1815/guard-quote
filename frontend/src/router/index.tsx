@@ -18,6 +18,7 @@ import UserPortal from "../pages/UserPortal";
 import AdminLogin from "../pages/admin/AdminLogin";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import AdminUsers from "../pages/admin/AdminUsers";
+import AdminServices from "../pages/admin/AdminServices";
 
 export default function AppRouter() {
   return (
@@ -118,6 +119,17 @@ export default function AppRouter() {
           <AdminGuard>
             <AdminLayout>
               <AdminUsers />
+            </AdminLayout>
+          </AdminGuard>
+        }
+      />
+
+      <Route
+        path="/admin/services"
+        element={
+          <AdminGuard>
+            <AdminLayout>
+              <AdminServices />
             </AdminLayout>
           </AdminGuard>
         }
