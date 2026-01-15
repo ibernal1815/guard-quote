@@ -24,6 +24,7 @@ Use this skill when working with GuardQuote infrastructure, SSH connections, or 
 | PostgreSQL 15 | 5432 | active | WPU8bj3nbwFyZFEtHZQz |
 | Redis 7 | 6379 | active | guardquote_redis_2024 |
 | PgBouncer | 6432 | active | WPU8bj3nbwFyZFEtHZQz |
+| Pi-hole FTL | 53 | active | - |
 | fail2ban | - | active | - |
 
 **Docker Services:**
@@ -41,8 +42,9 @@ Use this skill when working with GuardQuote infrastructure, SSH connections, or 
 
 **UFW Firewall Rules:**
 - SSH (22) - Open to all
-- PostgreSQL (5432) - 192.168.2.0/24 only
-- Redis (6379) - 192.168.2.0/24 only
+- DNS (53 TCP/UDP) - Open to all (Pi-hole)
+- PostgreSQL (5432) - 192.168.2.0/24 and 192.168.1.0/24
+- Redis (6379) - 192.168.2.0/24 and 192.168.1.0/24
 - PgBouncer (6432) - 192.168.2.0/24 only
 - Prometheus (9090) - 192.168.2.0/24 only
 - Grafana (3000) - 192.168.2.0/24 only
@@ -122,9 +124,33 @@ redis://:guardquote_redis_2024@192.168.2.70:6379
 
 | Service | URL |
 |---------|-----|
+| Pi-hole Admin | http://192.168.2.70:8080/admin |
 | Grafana | http://192.168.2.70:3000 |
 | Prometheus | http://192.168.2.70:9090 |
 | Alertmanager | http://192.168.2.70:9093 |
+
+## Pi-hole DNS
+
+Pi1 runs Pi-hole v6 as the network DNS server.
+
+**Configuration:**
+- DNS Server: 192.168.2.70:53
+- Web Admin: http://192.168.2.70:8080/admin
+- Config File: /etc/pihole/pihole.toml
+- Listening Mode: ALL (accepts from any network)
+- Upstreams: 1.1.1.1, 1.0.0.1, 9.9.9.9, 149.112.112.112
+
+**Quick Commands:**
+```bash
+# Check Pi-hole status
+ssh pi1 "pihole status"
+
+# View live query log
+ssh pi1 "sudo pihole -t"
+
+# Test DNS resolution
+dig @192.168.2.70 google.com +short
+```
 
 ## Configuration Files on Pi1
 
