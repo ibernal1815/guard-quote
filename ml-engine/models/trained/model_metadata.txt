@@ -1,0 +1,4 @@
+price_model: Gradient Boosting
+price_features: 15
+risk_features: 12
+trained_at: 2026-01-14T16:43:15.033095
