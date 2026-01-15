@@ -13,9 +13,10 @@ Security guard service quoting platform with ML-powered pricing, real-time WebSo
 ### Admin Dashboard
 - **Authentication** - JWT + refresh tokens with Argon2 password hashing
 - **User Management** - Create, edit, and manage admin users
-- **Service Management** - Start/stop/restart Pi1 services from the UI
+- **Service Management** - Compact LED-status view, click to manage services
 - **System Monitoring** - View Pi1 system info (load, memory, disk, temp)
 - **Dashboard Stats** - Overview of quotes, revenue, clients
+- **Automated Backups** - Daily PostgreSQL, Redis, and config backups
 
 ## Tech Stack
 
@@ -120,6 +121,17 @@ The database and monitoring services run on a Raspberry Pi (Pi1):
 | Grafana | 3000 | Docker |
 | Alertmanager | 9093 | Docker |
 | Loki | 3100 | Docker |
+
+### Backups
+
+Automated daily backups run at 2 AM on Pi1:
+- **PostgreSQL** - Full database dump (pg_dump -Fc)
+- **Redis** - RDB snapshot
+- **Configs** - postgresql.conf, pg_hba.conf, pgbouncer.ini, fail2ban, pihole
+
+Local retention: 3 days | Remote (Pi0): 7 days
+
+Manual backup: `ssh pi1 "~/backup-guardquote.sh"`
 
 ## Development
 

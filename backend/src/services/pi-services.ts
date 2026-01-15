@@ -9,8 +9,9 @@ const PI_PASS = "481526";
 interface ServiceStatus {
   name: string;
   displayName: string;
+  description: string;
   type: "systemd" | "docker";
-  status: "running" | "stopped" | "error" | "unknown";
+  status: "running" | "stopped" | "error" | "unknown" | "planned";
   uptime?: string;
   port?: number;
   memory?: string;
@@ -23,41 +24,111 @@ interface ServiceAction {
   output?: string;
 }
 
-// Service definitions
+// Service definitions with descriptions
 const SERVICES = [
-  { name: "postgresql", displayName: "PostgreSQL", type: "systemd" as const, port: 5432 },
-  { name: "redis-server", displayName: "Redis", type: "systemd" as const, port: 6379 },
-  { name: "pgbouncer", displayName: "PgBouncer", type: "systemd" as const, port: 6432 },
-  { name: "fail2ban", displayName: "Fail2ban", type: "systemd" as const },
-  { name: "ufw", displayName: "UFW Firewall", type: "systemd" as const },
-  { name: "prometheus", displayName: "Prometheus", type: "docker" as const, port: 9090 },
-  { name: "grafana", displayName: "Grafana", type: "docker" as const, port: 3000 },
-  { name: "alertmanager", displayName: "Alertmanager", type: "docker" as const, port: 9093 },
-  { name: "node-exporter", displayName: "Node Exporter", type: "docker" as const, port: 9100 },
-  { name: "loki", displayName: "Loki", type: "docker" as const, port: 3100 },
-  { name: "promtail", displayName: "Promtail", type: "docker" as const },
+  // Database & Cache
+  { name: "postgresql", displayName: "PostgreSQL", type: "systemd" as const, port: 5432,
+    description: "Primary relational database storing users, quotes, clients, and event data" },
+  { name: "redis-server", displayName: "Redis", type: "systemd" as const, port: 6379,
+    description: "In-memory cache for sessions, rate limiting, and frequently accessed data" },
+  { name: "pgbouncer", displayName: "PgBouncer", type: "systemd" as const, port: 6432,
+    description: "Connection pooler that manages PostgreSQL connections efficiently" },
+
+  // Security
+  { name: "fail2ban", displayName: "Fail2ban", type: "systemd" as const,
+    description: "Intrusion prevention that bans IPs with too many failed login attempts" },
+  { name: "ufw", displayName: "UFW Firewall", type: "systemd" as const,
+    description: "Firewall controlling network access to services by IP and port" },
+  { name: "pihole-FTL", displayName: "Pi-hole DNS", type: "systemd" as const, port: 53,
+    description: "Network-wide DNS server with ad blocking and query logging" },
+
+  // Monitoring Stack
+  { name: "prometheus", displayName: "Prometheus", type: "docker" as const, port: 9090,
+    description: "Time-series database collecting metrics from all services and hosts" },
+  { name: "grafana", displayName: "Grafana", type: "docker" as const, port: 3000,
+    description: "Visualization dashboards for metrics, logs, and alerting" },
+  { name: "alertmanager", displayName: "Alertmanager", type: "docker" as const, port: 9093,
+    description: "Handles alerts from Prometheus, routing notifications to email/Slack" },
+  { name: "node-exporter", displayName: "Node Exporter", type: "docker" as const, port: 9100,
+    description: "Exports host metrics (CPU, memory, disk, network) to Prometheus" },
+  { name: "loki", displayName: "Loki", type: "docker" as const, port: 3100,
+    description: "Log aggregation system - like Prometheus but for logs" },
+  { name: "promtail", displayName: "Promtail", type: "docker" as const,
+    description: "Agent that ships local logs to Loki for centralized viewing" },
+
+  // Planned Services (not yet deployed)
+  { name: "traefik", displayName: "Traefik", type: "docker" as const, port: 443, planned: true,
+    description: "API Gateway & reverse proxy with automatic SSL and load balancing" },
+  { name: "openldap", displayName: "OpenLDAP", type: "docker" as const, port: 389, planned: true,
+    description: "Directory service for centralized user authentication across apps" },
+  { name: "keycloak", displayName: "Keycloak", type: "docker" as const, port: 8080, planned: true,
+    description: "Identity provider with SSO, OAuth2, and LDAP integration" },
+  { name: "vault", displayName: "HashiCorp Vault", type: "docker" as const, port: 8200, planned: true,
+    description: "Secrets management for API keys, passwords, and certificates" },
+  { name: "minio", displayName: "MinIO", type: "docker" as const, port: 9000, planned: true,
+    description: "S3-compatible object storage for documents and file uploads" },
 ];
 
-// Execute SSH command on Pi with timeout
-async function sshExec(command: string, timeoutMs: number = 5000): Promise<{ stdout: string; stderr: string; exitCode: number }> {
-  const proc = Bun.spawn(["sshpass", "-p", PI_PASS, "ssh", "-o", "StrictHostKeyChecking=no", "-o", "ConnectTimeout=3", `${PI_USER}@${PI_HOST}`, command], {
-    stdout: "pipe",
-    stderr: "pipe",
-  });
+// Sleep helper for retry backoff
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-  // Add timeout
-  const timeout = setTimeout(() => proc.kill(), timeoutMs);
+// Execute SSH command on Pi with timeout and retry logic
+async function sshExec(
+  command: string,
+  timeoutMs: number = 5000,
+  maxRetries: number = 3
+): Promise<{ stdout: string; stderr: string; exitCode: number }> {
+  let lastError: { stdout: string; stderr: string; exitCode: number } = {
+    stdout: "",
+    stderr: "All retries failed",
+    exitCode: 1
+  };
 
-  try {
-    const stdout = await new Response(proc.stdout).text();
-    const stderr = await new Response(proc.stderr).text();
-    const exitCode = await proc.exited;
-    clearTimeout(timeout);
-    return { stdout: stdout.trim(), stderr: stderr.trim(), exitCode };
-  } catch (error) {
-    clearTimeout(timeout);
-    return { stdout: "", stderr: "Command timed out", exitCode: 1 };
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    const proc = Bun.spawn([
+      "sshpass", "-p", PI_PASS,
+      "ssh",
+      "-o", "StrictHostKeyChecking=no",
+      "-o", "UserKnownHostsFile=/dev/null",
+      "-o", "ConnectTimeout=3",
+      "-o", "BatchMode=no",
+      `${PI_USER}@${PI_HOST}`,
+      command
+    ], {
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+
+    const timeout = setTimeout(() => proc.kill(), timeoutMs);
+
+    try {
+      const stdout = await new Response(proc.stdout).text();
+      const stderr = await new Response(proc.stderr).text();
+      const exitCode = await proc.exited;
+      clearTimeout(timeout);
+
+      // Success or command executed (even with non-zero exit)
+      if (exitCode === 0 || !stderr.includes("Connection") && !stderr.includes("timed out")) {
+        return { stdout: stdout.trim(), stderr: stderr.trim(), exitCode };
+      }
+
+      // Connection error - retry
+      lastError = { stdout: stdout.trim(), stderr: stderr.trim(), exitCode };
+      if (attempt < maxRetries) {
+        console.log(`SSH attempt ${attempt} failed, retrying in ${attempt}s...`);
+        await sleep(1000 * attempt); // Exponential backoff: 1s, 2s, 3s
+      }
+    } catch (error) {
+      clearTimeout(timeout);
+      lastError = { stdout: "", stderr: "Command timed out", exitCode: 1 };
+      if (attempt < maxRetries) {
+        console.log(`SSH attempt ${attempt} timed out, retrying in ${attempt}s...`);
+        await sleep(1000 * attempt);
+      }
+    }
   }
+
+  return lastError;
 }
 
 // Get status of a systemd service
@@ -111,7 +182,19 @@ async function getDockerStatus(containerName: string): Promise<Partial<ServiceSt
 // Get all service statuses (parallel for speed)
 export async function getAllServiceStatuses(): Promise<ServiceStatus[]> {
   // Run all status checks in parallel
-  const statusPromises = SERVICES.map(async (svc) => {
+  const statusPromises = SERVICES.map(async (svc: any) => {
+    // Handle planned services - don't check status
+    if (svc.planned) {
+      return {
+        name: svc.name,
+        displayName: svc.displayName,
+        description: svc.description,
+        type: svc.type,
+        port: svc.port,
+        status: "planned",
+      } as ServiceStatus;
+    }
+
     try {
       const statusInfo = svc.type === "systemd"
         ? await getSystemdStatus(svc.name)
@@ -120,6 +203,7 @@ export async function getAllServiceStatuses(): Promise<ServiceStatus[]> {
       return {
         name: svc.name,
         displayName: svc.displayName,
+        description: svc.description,
         type: svc.type,
         port: svc.port,
         status: statusInfo.status || "unknown",
@@ -131,6 +215,7 @@ export async function getAllServiceStatuses(): Promise<ServiceStatus[]> {
       return {
         name: svc.name,
         displayName: svc.displayName,
+        description: svc.description,
         type: svc.type,
         port: svc.port,
         status: "error",

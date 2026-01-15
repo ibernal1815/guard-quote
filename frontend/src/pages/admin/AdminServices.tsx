@@ -6,8 +6,9 @@ import styles from "./AdminServices.module.css";
 interface Service {
   name: string;
   displayName: string;
+  description: string;
   type: "systemd" | "docker";
-  status: "running" | "stopped" | "error" | "unknown";
+  status: "running" | "stopped" | "error" | "unknown" | "planned";
   uptime?: string;
   port?: number;
   memory?: string;
@@ -34,6 +35,7 @@ export default function AdminServices() {
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [logs, setLogs] = useState<{ service: string; content: string } | null>(null);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [selectedService, setSelectedService] = useState<string | null>(null);
 
   const fetchServices = useCallback(async () => {
     try {
@@ -121,6 +123,7 @@ export default function AdminServices() {
       case "running": return styles.statusRunning;
       case "stopped": return styles.statusStopped;
       case "error": return styles.statusError;
+      case "planned": return styles.statusPlanned;
       default: return styles.statusUnknown;
     }
   };
@@ -137,6 +140,7 @@ export default function AdminServices() {
   const runningCount = services.filter(s => s.status === "running").length;
   const stoppedCount = services.filter(s => s.status === "stopped").length;
   const errorCount = services.filter(s => s.status === "error").length;
+  const plannedCount = services.filter(s => s.status === "planned").length;
 
   return (
     <div className={styles.container}>
@@ -206,91 +210,116 @@ export default function AdminServices() {
           <span className={styles.summaryCount}>{errorCount}</span>
           <span className={styles.summaryLabel}>Error</span>
         </div>
+        <div className={`${styles.summaryItem} ${styles.planned}`}>
+          <span className={styles.summaryCount}>{plannedCount}</span>
+          <span className={styles.summaryLabel}>Planned</span>
+        </div>
       </div>
 
       {/* Services Grid */}
       <div className={styles.servicesGrid}>
-        {services.map((service) => (
-          <div key={service.name} className={styles.serviceCard}>
-            <div className={styles.serviceHeader}>
-              <div className={styles.serviceInfo}>
-                <span className={styles.serviceName}>{service.displayName}</span>
-                <span className={styles.serviceType}>{service.type}</span>
-              </div>
-              <div className={`${styles.statusBadge} ${getStatusClass(service.status)}`}>
-                {service.status}
-              </div>
-            </div>
+        {services.map((service) => {
+          const isSelected = selectedService === service.name;
+          const isPlanned = service.status === "planned";
 
-            <div className={styles.serviceDetails}>
-              {service.port && (
-                <div className={styles.detail}>
-                  <span>Port:</span> {service.port}
-                </div>
-              )}
-              {service.uptime && (
-                <div className={styles.detail}>
-                  <span>Uptime:</span> {service.uptime}
-                </div>
-              )}
-              {service.memory && (
-                <div className={styles.detail}>
-                  <span>Memory:</span> {service.memory}
-                </div>
-              )}
-              {service.cpu && (
-                <div className={styles.detail}>
-                  <span>CPU:</span> {service.cpu}
-                </div>
-              )}
+          return (
+            <div
+              key={service.name}
+              className={`${styles.serviceCard} ${isPlanned ? styles.plannedCard : ""} ${isSelected ? styles.selectedCard : ""}`}
+              onClick={() => setSelectedService(isSelected ? null : service.name)}
+              title={service.description}
+            >
+              <div className={`${styles.led} ${styles[`led${service.status.charAt(0).toUpperCase() + service.status.slice(1)}`]}`} />
+              <span className={styles.serviceName}>{service.displayName}</span>
+              {service.port && <span className={styles.servicePort}>:{service.port}</span>}
             </div>
-
-            <div className={styles.serviceActions}>
-              {service.status === "running" ? (
-                <>
-                  <button
-                    className={`${styles.actionBtn} ${styles.restartBtn}`}
-                    onClick={() => handleAction(service.name, "restart")}
-                    disabled={actionInProgress !== null}
-                  >
-                    {actionInProgress === `${service.name}-restart` ? "..." : "Restart"}
-                  </button>
-                  <button
-                    className={`${styles.actionBtn} ${styles.stopBtn}`}
-                    onClick={() => handleAction(service.name, "stop")}
-                    disabled={actionInProgress !== null}
-                  >
-                    {actionInProgress === `${service.name}-stop` ? "..." : "Stop"}
-                  </button>
-                </>
-              ) : (
-                <button
-                  className={`${styles.actionBtn} ${styles.startBtn}`}
-                  onClick={() => handleAction(service.name, "start")}
-                  disabled={actionInProgress !== null}
-                >
-                  {actionInProgress === `${service.name}-start` ? "..." : "Start"}
-                </button>
-              )}
-              <button
-                className={`${styles.actionBtn} ${styles.logsBtn}`}
-                onClick={() => handleViewLogs(service.name)}
-              >
-                Logs
-              </button>
-              {service.status === "error" && (
-                <button
-                  className={`${styles.actionBtn} ${styles.remediateBtn}`}
-                  onClick={() => handleAction(service.name, "remediate")}
-                  disabled={actionInProgress !== null}
-                >
-                  {actionInProgress === `${service.name}-remediate` ? "..." : "Fix"}
-                </button>
-              )}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+
+      {/* Selected Service Panel */}
+      {selectedService && (() => {
+        const service = services.find(s => s.name === selectedService);
+        if (!service) return null;
+
+        const isPlanned = service.status === "planned";
+
+        return (
+          <div className={`${styles.actionPanel} ${isPlanned ? styles.plannedPanel : ""}`}>
+            <div className={styles.panelHeader}>
+              <div className={styles.panelTitle}>
+                <div className={`${styles.led} ${styles[`led${service.status.charAt(0).toUpperCase() + service.status.slice(1)}`]}`} />
+                <span>{service.displayName}</span>
+                {isPlanned && <span className={styles.plannedTag}>Coming Soon</span>}
+              </div>
+              <button className={styles.panelClose} onClick={() => setSelectedService(null)}>×</button>
+            </div>
+
+            <p className={styles.panelDescription}>{service.description}</p>
+
+            {!isPlanned && (
+              <>
+                <div className={styles.panelDetails}>
+                  {service.port && <span>Port {service.port}</span>}
+                  {service.uptime && <span>Up {service.uptime}</span>}
+                  {service.memory && <span>{service.memory}</span>}
+                  {service.cpu && <span>{service.cpu}</span>}
+                </div>
+
+                <div className={styles.panelActions}>
+                  {service.status === "running" ? (
+                    <>
+                      <button
+                        className={`${styles.actionBtn} ${styles.restartBtn}`}
+                        onClick={() => handleAction(service.name, "restart")}
+                        disabled={actionInProgress !== null}
+                      >
+                        {actionInProgress === `${service.name}-restart` ? "..." : "Restart"}
+                      </button>
+                      <button
+                        className={`${styles.actionBtn} ${styles.stopBtn}`}
+                        onClick={() => handleAction(service.name, "stop")}
+                        disabled={actionInProgress !== null}
+                      >
+                        {actionInProgress === `${service.name}-stop` ? "..." : "Stop"}
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      className={`${styles.actionBtn} ${styles.startBtn}`}
+                      onClick={() => handleAction(service.name, "start")}
+                      disabled={actionInProgress !== null}
+                    >
+                      {actionInProgress === `${service.name}-start` ? "..." : "Start"}
+                    </button>
+                  )}
+                  <button
+                    className={`${styles.actionBtn} ${styles.logsBtn}`}
+                    onClick={() => handleViewLogs(service.name)}
+                  >
+                    Logs
+                  </button>
+                  {service.status === "error" && (
+                    <button
+                      className={`${styles.actionBtn} ${styles.remediateBtn}`}
+                      onClick={() => handleAction(service.name, "remediate")}
+                      disabled={actionInProgress !== null}
+                    >
+                      {actionInProgress === `${service.name}-remediate` ? "..." : "Fix"}
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
+
+            {isPlanned && service.port && (
+              <div className={styles.panelDetails}>
+                <span>Port {service.port}</span>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Logs Modal */}
       {logs && (

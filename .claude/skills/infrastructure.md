@@ -163,11 +163,43 @@ dig @192.168.2.70 google.com +short
 | PgBouncer Users | /etc/pgbouncer/userlist.txt |
 | fail2ban | /etc/fail2ban/jail.local |
 
-## Backup Info
+## Backups
 
+### Automated Daily Backups (2 AM)
+**Script:** `/home/johnmarston/backup-guardquote.sh`
+**Cron:** `0 2 * * * /home/johnmarston/backup-guardquote.sh`
+
+**What's backed up:**
+| Item | Method | Size |
+|------|--------|------|
+| PostgreSQL | pg_dump -Fc | ~42KB |
+| Redis | BGSAVE + copy | ~100B |
+| Configs | tar.gz | ~30KB |
+
+**Configs included:** postgresql.conf, pg_hba.conf, pgbouncer.ini, fail2ban, pihole.toml
+
+**Storage:**
+- Local (Pi1): `/home/johnmarston/backups/` - 3 day retention
+- Remote (Pi0): `/home/rafaeljg/backups/pi1/` - 7 day retention (when accessible)
+
+### Manual Backup
+```bash
+ssh pi1 "~/backup-guardquote.sh"
+```
+
+### Restore PostgreSQL
+```bash
+# Copy backup locally
+scp pi1:~/backups/guardquote_YYYYMMDD_HHMMSS.dump ./
+
+# Restore
+ssh pi1 "sudo -u postgres pg_restore -d guardquote -c guardquote_YYYYMMDD.dump"
+```
+
+### Data Locations
 - PostgreSQL data: /var/lib/postgresql/
 - Redis data: /var/lib/redis/
-- Backup staging: /tmp/guardquote-backups/
+- Backup staging: /home/johnmarston/backups/
 
 ## Resources (as of last check)
 
@@ -177,5 +209,6 @@ dig @192.168.2.70 google.com +short
 
 ---
 
-*Last updated: January 14, 2026*
+*Last updated: January 15, 2026*
 *Phase -1 Infrastructure: Complete*
+*Backups: Automated daily at 2 AM*
