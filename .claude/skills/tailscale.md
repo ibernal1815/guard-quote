@@ -39,15 +39,12 @@ sudo tailscale up
 
 ## Infrastructure Nodes
 
-Once on the tailnet, these become accessible:
+| Node | Tailscale IP | Status | Services |
+|------|--------------|--------|----------|
+| Pi1 | `100.66.167.62` | ✅ Online | PostgreSQL:5432, Redis:6379, Grafana:3000 |
+| Pi0 | TBD | ⏳ Pending | GitHub Runner, Backup storage |
 
-| Node | Tailscale IP | Services |
-|------|--------------|----------|
-| Pi1 | `100.x.x.x` | PostgreSQL:5432, Redis:6379, Grafana:3000 |
-| Pi0 | `100.x.x.x` | GitHub Runner, Backup storage |
-| Your Mac | `100.x.x.x` | Development machine |
-
-*Note: Tailscale IPs are assigned dynamically. Check Machines tab for actual IPs.*
+**Pi1 DNS:** `pi1.tail0c06e2.ts.net`
 
 ## Pi Cluster Setup
 

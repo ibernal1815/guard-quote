@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GuardQuote - Team Demo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/dist/theme/black.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/plugin/highlight/monokai.css">
+    <style>
+        .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+        .reveal pre { font-size: 0.55em; }
+        .reveal table { font-size: 0.7em; }
+        .reveal .small { font-size: 0.6em; }
+        .reveal .highlight { color: #42affa; }
+        .reveal .success { color: #4caf50; }
+        .reveal .warning { color: #ff9800; }
+        code { background: #333; padding: 2px 8px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- Title -->
+<section>
+    <h1>GuardQuote</h1>
+    <h3>ML-Powered Security Guard Quoting Platform</h3>
+    <p class="small">Team Demo - January 2026</p>
+</section>
+
+<!-- Agenda -->
+<section>
+    <h2>Agenda</h2>
+    <ol>
+        <li>Architecture Overview</li>
+        <li>Team Access (Tailscale VPN)</li>
+        <li>Local Development Setup</li>
+        <li>AWS Deployment</li>
+        <li>Live Demo</li>
+        <li>Role Assignments</li>
+    </ol>
+</section>
+
+<!-- Architecture -->
+<section>
+    <section>
+        <h2>Architecture</h2>
+        <pre><code class="text">
+┌─────────────────────────────────────────────────────────┐
+│  Your Machine                                            │
+│  ┌───────────┐  ┌───────────┐  ┌───────────┐            │
+│  │ Frontend  │  │ Backend   │  │ ML Engine │            │
+│  │ React 19  │  │ Bun+Hono  │  │ FastAPI   │            │
+│  │ :5173     │  │ :3000     │  │ :8000     │            │
+│  └───────────┘  └───────────┘  └───────────┘            │
+└────────────────────────┬────────────────────────────────┘
+                         │ Tailscale VPN
+                         ▼
+┌─────────────────────────────────────────────────────────┐
+│  Pi Cluster                                              │
+│  ┌─────────────────┐       ┌─────────────────┐          │
+│  │ Pi1             │       │ Pi0             │          │
+│  │ PostgreSQL      │       │ GitHub Runner   │          │
+│  │ Redis           │       │ Backups         │          │
+│  │ Grafana         │       │                 │          │
+│  │ 100.66.167.62   │       │ (offline)       │          │
+│  └─────────────────┘       └─────────────────┘          │
+└─────────────────────────────────────────────────────────┘
+        </code></pre>
+    </section>
+
+    <section>
+        <h2>Tech Stack</h2>
+        <table>
+            <tr><th>Layer</th><th>Technology</th></tr>
+            <tr><td>Frontend</td><td>React 19 + Vite + TypeScript</td></tr>
+            <tr><td>Backend</td><td>Bun 1.3 + Hono</td></tr>
+            <tr><td>ML Engine</td><td>Python 3.12 + FastAPI + scikit-learn</td></tr>
+            <tr><td>Database</td><td>PostgreSQL 15 (Pi1)</td></tr>
+            <tr><td>Cache</td><td>Redis 7 (Pi1)</td></tr>
+            <tr><td>Auth</td><td>JWT + Argon2</td></tr>
+            <tr><td>Real-time</td><td>WebSocket</td></tr>
+        </table>
+    </section>
+</section>
+
+<!-- Tailscale -->
+<section>
+    <section>
+        <h2>Team Access</h2>
+        <h3>Tailscale VPN</h3>
+        <p>Connect from anywhere to Pi1 services</p>
+    </section>
+
+    <section>
+        <h3>Step 1: Accept Invite</h3>
+        <p>Check your email for Tailscale invite to join:</p>
+        <p><code class="highlight">jag18729.github</code></p>
+    </section>
+
+    <section>
+        <h3>Step 2: Install & Connect</h3>
+        <pre><code class="bash">
+# macOS
+brew install tailscale
+
+# Linux
+curl -fsSL https://tailscale.com/install.sh | sh
+
+# Authenticate
+sudo tailscale up
+# → Opens browser → Login with GitHub
+        </code></pre>
+    </section>
+
+    <section>
+        <h3>Step 3: Verify</h3>
+        <pre><code class="bash">
+# Check status
+tailscale status
+
+# Ping Pi1
+tailscale ping pi1
+
+# You should see:
+# 100.66.167.62  pi1  jag18729@  linux  -
+        </code></pre>
+    </section>
+
+    <section>
+        <h3>Pi1 Services (via Tailscale)</h3>
+        <table>
+            <tr><th>Service</th><th>URL</th></tr>
+            <tr><td>PostgreSQL</td><td><code>100.66.167.62:5432</code></td></tr>
+            <tr><td>Redis</td><td><code>100.66.167.62:6379</code></td></tr>
+            <tr><td>Grafana</td><td><code>http://100.66.167.62:3000</code></td></tr>
+            <tr><td>Prometheus</td><td><code>http://100.66.167.62:9090</code></td></tr>
+        </table>
+    </section>
+</section>
+
+<!-- Local Setup -->
+<section>
+    <section>
+        <h2>Local Development</h2>
+        <h3>10-Minute Setup</h3>
+    </section>
+
+    <section>
+        <h3>Clone & Configure</h3>
+        <pre><code class="bash">
+git clone https://github.com/jag18729/guard-quote.git
+cd guard-quote
+cp .env.example .env
+        </code></pre>
+    </section>
+
+    <section>
+        <h3>Environment Variables</h3>
+        <pre><code class="bash">
+# .env
+DB_HOST=100.66.167.62
+DB_PASSWORD=WPU8bj3nbwFyZFEtHZQz
+
+REDIS_HOST=100.66.167.62
+REDIS_PASSWORD=guardquote_redis_2024
+
+JWT_SECRET=guardquote_local_dev_secret_32chars
+ML_ENGINE_SECRET=guardquote_s2s_secret_2026
+        </code></pre>
+    </section>
+
+    <section>
+        <h3>Start Services</h3>
+        <pre><code class="bash">
+# Terminal 1 - Backend
+cd backend && bun install && bun run dev
+# → http://localhost:3000
+
+# Terminal 2 - Frontend
+cd frontend && bun install && bun run dev
+# → http://localhost:5173
+
+# Terminal 3 - ML Engine
+cd ml-engine
+python -m venv .venv && source .venv/bin/activate
+pip install -e . && uvicorn src.main:app --reload --port 8000
+# → http://localhost:8000
+        </code></pre>
+    </section>
+
+    <section>
+        <h3>Verify</h3>
+        <pre><code class="bash">
+# Backend health
+curl http://localhost:3000/health
+# {"status":"healthy","database":"connected"}
+
+# ML Engine
+curl http://localhost:8000/health
+# {"status":"healthy","model_status":"active"}
+
+# Frontend
+open http://localhost:5173
+        </code></pre>
+    </section>
+</section>
+
+<!-- AWS Deployment -->
+<section>
+    <section>
+        <h2>AWS Deployment</h2>
+        <h3>Production Architecture</h3>
+    </section>
+
+    <section>
+        <h3>Amplify (Frontend)</h3>
+        <pre><code class="text">
+Amplify Console
+  → Create new app
+  → GitHub
+  → guard-quote repo
+  → main branch
+  → Deploy
+
+Result: https://main.xxxxx.amplifyapp.com
+        </code></pre>
+    </section>
+
+    <section>
+        <h3>CloudFormation (Backend)</h3>
+        <pre><code class="bash">
+cd aws
+
+export KEY_NAME=guardquote-demo
+export DB_PASSWORD=WPU8bj3nbwFyZFEtHZQz
+export JWT_SECRET=your_secret_here
+
+./deploy.sh demo deploy-all
+        </code></pre>
+    </section>
+
+    <section>
+        <h3>AWS Architecture</h3>
+        <pre><code class="text">
+┌─────────────────────────────────────────┐
+│  AWS Cloud                               │
+│  ┌─────────────┐    ┌─────────────┐     │
+│  │ CloudFront  │───▶│ S3 Bucket   │     │
+│  │ (CDN)       │    │ (React)     │     │
+│  └─────────────┘    └─────────────┘     │
+│         │                                │
+│  ┌─────────────┐    ┌─────────────┐     │
+│  │ EC2 Backend │    │ EC2 LDAP    │     │
+│  │ (Bun+Hono)  │    │ (OpenLDAP)  │     │
+│  └──────┬──────┘    └─────────────┘     │
+└─────────┼───────────────────────────────┘
+          │ Tailscale
+          ▼
+     Pi1 (PostgreSQL, Redis)
+        </code></pre>
+    </section>
+</section>
+
+<!-- Live Demo -->
+<section>
+    <section>
+        <h2>Live Demo</h2>
+    </section>
+
+    <section>
+        <h3>Quote Wizard</h3>
+        <p><code>http://localhost:5173/quote/security</code></p>
+        <ul>
+            <li>4-step form</li>
+            <li>Real-time WebSocket pricing</li>
+            <li>ML-powered risk assessment</li>
+        </ul>
+    </section>
+
+    <section>
+        <h3>Admin Dashboard</h3>
+        <p><code>http://localhost:5173/admin/login</code></p>
+        <p>Login: <code>admin@guardquote.com</code> / <code>admin123</code></p>
+        <ul>
+            <li>Dashboard stats</li>
+            <li>User management</li>
+            <li>Service monitoring (Pi1)</li>
+        </ul>
+    </section>
+
+    <section>
+        <h3>ML Prediction API</h3>
+        <pre><code class="bash">
+curl -X POST http://localhost:3000/ml/quote \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event_type": "concert",
+    "location_zip": "90001",
+    "num_guards": 4,
+    "hours": 8,
+    "crowd_size": 2000
+  }'
+        </code></pre>
+    </section>
+
+    <section>
+        <h3>Grafana Monitoring</h3>
+        <p><code>http://100.66.167.62:3000</code></p>
+        <ul>
+            <li>Pi1 system metrics</li>
+            <li>PostgreSQL stats</li>
+            <li>ML model performance</li>
+        </ul>
+    </section>
+</section>
+
+<!-- Role Assignments -->
+<section>
+    <section>
+        <h2>Team Roles</h2>
+    </section>
+
+    <section>
+        <h3>Frontend Developer</h3>
+        <table>
+            <tr><th>Focus</th><td>React, Quote Wizard, Admin UI</td></tr>
+            <tr><th>Files</th><td><code>frontend/src/pages/</code></td></tr>
+            <tr><th>Commands</th><td><code>cd frontend && bun run dev</code></td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h3>Backend Developer</h3>
+        <table>
+            <tr><th>Focus</th><td>Bun/Hono API, Auth, WebSocket</td></tr>
+            <tr><th>Files</th><td><code>backend/src/</code></td></tr>
+            <tr><th>Commands</th><td><code>cd backend && bun run dev</code></td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h3>ML Engineer</h3>
+        <table>
+            <tr><th>Focus</th><td>Training, Models, FastAPI</td></tr>
+            <tr><th>Files</th><td><code>ml-engine/src/</code>, <code>scripts/</code></td></tr>
+            <tr><th>Commands</th><td><code>python scripts/train_models.py</code></td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h3>DevOps</h3>
+        <table>
+            <tr><th>Focus</th><td>Pi Cluster, CI/CD, AWS</td></tr>
+            <tr><th>Files</th><td><code>aws/</code>, <code>.github/workflows/</code></td></tr>
+            <tr><th>Commands</th><td><code>./deploy.sh demo deploy-all</code></td></tr>
+        </table>
+    </section>
+</section>
+
+<!-- Credentials -->
+<section>
+    <h2>Quick Reference</h2>
+    <table class="small">
+        <tr><th>Resource</th><th>Value</th></tr>
+        <tr><td>Pi1 Tailscale IP</td><td><code>100.66.167.62</code></td></tr>
+        <tr><td>PostgreSQL</td><td><code>guardquote:WPU8bj3nbwFyZFEtHZQz</code></td></tr>
+        <tr><td>Redis</td><td><code>guardquote_redis_2024</code></td></tr>
+        <tr><td>Admin Login</td><td><code>admin@guardquote.com / admin123</code></td></tr>
+        <tr><td>GitHub Repo</td><td><code>jag18729/guard-quote</code></td></tr>
+        <tr><td>Tailnet</td><td><code>jag18729.github</code></td></tr>
+    </table>
+</section>
+
+<!-- Resources -->
+<section>
+    <h2>Resources</h2>
+    <ul>
+        <li><code>QUICKSTART.md</code> - Setup guide</li>
+        <li><code>CLAUDE.md</code> - Project overview</li>
+        <li><code>.claude/skills/</code> - Detailed docs</li>
+        <li><code>aws/README.md</code> - AWS deployment</li>
+    </ul>
+    <p class="small">Questions? Check <code>.claude/skills/troubleshooting.md</code></p>
+</section>
+
+<!-- End -->
+<section>
+    <h1>Let's Build!</h1>
+    <p>Clone the repo and get started</p>
+    <pre><code class="bash">git clone https://github.com/jag18729/guard-quote.git</code></pre>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/plugin/highlight/highlight.js"></script>
+<script>
+    Reveal.initialize({
+        hash: true,
+        plugins: [RevealHighlight],
+        transition: 'slide'
+    });
+</script>
+</body>
+</html>
