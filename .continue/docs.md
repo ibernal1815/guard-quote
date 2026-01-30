@@ -150,8 +150,70 @@ cd ml-engine && pytest tests/
 # Trigger ML training
 gh workflow run train-ml.yml
 
-# Run integration tests
+# Run integration tests (requires self-hosted runner)
+mv .github/workflows/integration.yml.disabled .github/workflows/integration.yml
 gh workflow run integration.yml
+```
+
+## CI/CD
+
+### Workflows
+
+| Workflow | Trigger | Status |
+|----------|---------|--------|
+| `pr-check.yml` | Push/PR to main | ✅ Active |
+| `train-ml.yml` | Weekly/Manual | ✅ Active |
+| `integration.yml.disabled` | Manual | ⏸️ Disabled |
+
+### Run CI Locally
+
+```bash
+# Full CI simulation
+# Backend
+cd backend && bun install && bun run lint && bun run typecheck && bun test
+
+# Frontend
+cd frontend && bun install && bun run lint && bun run typecheck && bun test && bun run build
+
+# ML Engine
+cd ml-engine && pip install -e ".[dev]" && ruff check . && pytest tests/ -v
+```
+
+### Fix Lint Errors
+
+```bash
+# Frontend (ESLint + Prettier)
+cd frontend && bun run lint:fix && bun run format
+
+# Backend (Biome)
+cd backend && bun run lint:fix && bun run format
+
+# ML Engine (Ruff)
+cd ml-engine && ruff check --fix . && ruff format .
+```
+
+### Docker Build
+
+```bash
+# Build all images
+docker build -t guardquote-frontend ./frontend
+docker build -t guardquote-backend ./backend
+docker build -t guardquote-ml ./ml-engine
+
+# Run with compose
+docker-compose up -d
+```
+
+### Coverage Reports
+
+```bash
+# Frontend
+cd frontend && bun run test:coverage
+open coverage/index.html
+
+# ML Engine
+cd ml-engine && pytest tests/ --cov=src --cov-report=html
+open htmlcov/index.html
 ```
 
 ## Troubleshooting

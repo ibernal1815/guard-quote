@@ -61,6 +61,31 @@
       "name": "ssh",
       "description": "Generate SSH/Pi command",
       "prompt": "Generate a command for the Raspberry Pi cluster.\n\nInfrastructure:\n- Pi1 (100.66.167.62): PostgreSQL, Redis, Grafana, Prometheus\n- Pi0 (192.168.2.101): GitHub Actions runner\n\nUse sshpass for automation or recommend Tailscale approach."
+    },
+    {
+      "name": "ci",
+      "description": "Generate CI/CD workflow or fix",
+      "prompt": "Generate or fix CI/CD configuration for GuardQuote.\n\nContext:\n- Workflows in .github/workflows/\n- Active: pr-check.yml (lint, typecheck, test, build)\n- Disabled: integration.yml.disabled (requires self-hosted runner)\n- ML training: train-ml.yml (weekly, pushes to Prometheus)\n\nTools:\n- Frontend: ESLint + Prettier + Vitest\n- Backend: Biome + Bun test\n- ML Engine: Ruff + pytest\n\nFollow patterns in .claude/skills/ci-cd-recommendations.md"
+    },
+    {
+      "name": "dockerfile",
+      "description": "Generate Dockerfile",
+      "prompt": "Generate a Dockerfile for the selected service.\n\nPatterns:\n- Frontend: Multi-stage build with Bun → nginx\n- Backend: Bun runtime with health check\n- ML Engine: Python 3.12-slim with uvicorn\n\nInclude:\n- HEALTHCHECK instruction\n- Non-root user (security)\n- Minimal layers\n- .dockerignore considerations"
+    },
+    {
+      "name": "workflow",
+      "description": "Generate GitHub Actions workflow",
+      "prompt": "Generate a GitHub Actions workflow.\n\nAvailable runners:\n- ubuntu-latest: For public CI (lint, test, build)\n- self-hosted: For Pi1 access (integration, deploy)\n\nCommon actions:\n- actions/checkout@v4\n- oven-sh/setup-bun@v2\n- actions/setup-python@v5\n- docker/build-push-action@v5\n\nSecrets available:\n- PI1_DB_PASSWORD, PI1_REDIS_PASSWORD\n- CODECOV_TOKEN, GRAFANA_API_KEY"
+    },
+    {
+      "name": "lint-fix",
+      "description": "Fix linting errors",
+      "prompt": "Fix the linting errors in this code.\n\nLinting tools by project:\n- Frontend: ESLint (TypeScript + React rules)\n- Backend: Biome (fast, strict TypeScript)\n- ML Engine: Ruff (Python linting + formatting)\n\nCommon fixes:\n- Unused variables: prefix with _\n- Missing types: add explicit types\n- Import order: group by external/internal\n- Formatting: run prettier/biome format"
+    },
+    {
+      "name": "test-write",
+      "description": "Write test for code",
+      "prompt": "Write tests for this code.\n\nFrameworks:\n- Frontend: Vitest + @testing-library/react\n  - Use describe/test/expect\n  - Mock API calls with vi.mock\n  - Test user interactions with userEvent\n\n- Backend: Bun test\n  - Use describe/test/expect from 'bun:test'\n  - Test API endpoints with fetch\n  - Mock database with in-memory store\n\n- ML Engine: pytest\n  - Use fixtures for setup\n  - Test with FastAPI TestClient\n  - Mock model predictions for speed\n\nTarget: 80%+ coverage for new code"
     }
   ],
   "contextProviders": [
