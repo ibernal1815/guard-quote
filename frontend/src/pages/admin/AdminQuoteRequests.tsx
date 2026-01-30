@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { getAuthHeaders } from "../../context/AuthContext";
 import styles from "./AdminQuoteRequests.module.css";
 
 interface QuoteRequest {
@@ -35,7 +35,6 @@ const STATUS_OPTIONS = ["pending", "reviewed", "quoted", "accepted", "rejected"]
 
 export default function AdminQuoteRequests() {
   const navigate = useNavigate();
-  const { getAuthHeaders } = useAuth();
   const [requests, setRequests] = useState<QuoteRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
