@@ -34,9 +34,17 @@
   font-weight: 700;
   background: linear-gradient(90deg, #552583, #FDB927);
   -webkit-background-clip: text;
+  background-clip: text;
   color: transparent;
   white-space: nowrap;
   overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+  filter: brightness(1.2);
 }
 
 .collapsed .logo {

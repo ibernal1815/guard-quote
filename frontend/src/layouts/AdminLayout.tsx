@@ -32,7 +32,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       {/* Sidebar */}
       <aside className={`${styles.sidebar} ${sidebarCollapsed ? styles.collapsed : ""}`}>
         <div className={styles.sidebarHeader}>
-          <div className={styles.logo}>
+          <div className={styles.logo} onClick={() => navigate("/")} title="Back to Home">
             {sidebarCollapsed ? "GQ" : "GuardQuote"}
           </div>
           <button
