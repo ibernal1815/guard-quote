@@ -33,7 +33,7 @@ export default function AdminServices() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
-  const [logs, setLogs] = useState<{ service: string; content: string } | null>(null);
+  const [logs, setLogs] = useState<{ service: string; content: string; demoMode?: boolean } | null>(null);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [selectedService, setSelectedService] = useState<string | null>(null);
 
@@ -111,7 +111,7 @@ export default function AdminServices() {
       if (data.error) {
         showToast(data.error, "error");
       } else {
-        setLogs({ service: serviceName, content: data.logs });
+        setLogs({ service: serviceName, content: data.logs, demoMode: data.demoMode });
       }
     } catch (err: any) {
       showToast(err.message, "error");
@@ -327,6 +327,7 @@ export default function AdminServices() {
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h2>Logs: {logs.service}</h2>
+              {logs.demoMode && <span className={styles.demoBadge}>Demo Mode</span>}
               <button className={styles.closeBtn} onClick={() => setLogs(null)}>×</button>
             </div>
             <pre className={styles.logsContent}>{logs.content || "No logs available"}</pre>

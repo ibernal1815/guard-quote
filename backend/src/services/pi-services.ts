@@ -294,6 +294,14 @@ export async function controlService(serviceName: string, action: "start" | "sto
     return { success: false, message: `Unknown service: ${serviceName}` };
   }
 
+  // Demo mode - simulate success
+  if (await checkDemoMode()) {
+    return {
+      success: true,
+      message: `[Demo] ${svc.displayName} ${action} simulated - no actual changes made`,
+    };
+  }
+
   try {
     let command: string;
 
@@ -330,11 +338,53 @@ export async function controlService(serviceName: string, action: "start" | "sto
   }
 }
 
+// Demo logs for different services
+function getDemoLogs(serviceName: string): string {
+  const timestamp = new Date().toISOString();
+  const demoLogs: Record<string, string> = {
+    "postgresql": `${timestamp} LOG:  database system is ready to accept connections
+${timestamp} LOG:  autovacuum launcher started
+${timestamp} LOG:  checkpoint starting: time
+${timestamp} LOG:  checkpoint complete: wrote 42 buffers (0.3%)
+${timestamp} LOG:  connection received: host=127.0.0.1 port=52341
+${timestamp} LOG:  connection authorized: user=guardquote database=guardquote`,
+
+    "redis-server": `${timestamp} # Server started, Redis version 7.2.4
+${timestamp} * Ready to accept connections tcp
+${timestamp} - 0 clients connected (0 replicas), 1.2M bytes in use
+${timestamp} - DB 0: 127 keys (0 volatile)
+${timestamp} * Background saving started`,
+
+    "prometheus": `${timestamp} level=info msg="Server is ready to receive web requests."
+${timestamp} level=info msg="TSDB started"
+${timestamp} level=info msg="Completed WAL replay"
+${timestamp} level=info msg="Scrape targets loaded" count=12`,
+
+    "grafana": `${timestamp} level=info msg="HTTP Server Listen" address=0.0.0.0:3000
+${timestamp} level=info msg="Starting plugin search"
+${timestamp} level=info msg="Plugins registered" count=8`,
+
+    "default": `${timestamp} Service ${serviceName} is running in demo mode.
+${timestamp} No actual logs available - connect to a real server to view logs.
+${timestamp} Demo mode provides simulated service statuses only.`,
+  };
+
+  return demoLogs[serviceName] || demoLogs["default"];
+}
+
 // Get service logs
-export async function getServiceLogs(serviceName: string, lines: number = 50): Promise<{ logs: string; error?: string }> {
+export async function getServiceLogs(serviceName: string, lines: number = 50): Promise<{ logs: string; error?: string; demoMode?: boolean }> {
   const svc = SERVICES.find(s => s.name === serviceName);
   if (!svc) {
     return { logs: "", error: `Unknown service: ${serviceName}` };
+  }
+
+  // Return demo logs if in demo mode
+  if (await checkDemoMode()) {
+    return {
+      logs: getDemoLogs(serviceName),
+      demoMode: true
+    };
   }
 
   try {
@@ -363,6 +413,14 @@ export async function remediateService(serviceName: string): Promise<ServiceActi
   const svc = SERVICES.find(s => s.name === serviceName);
   if (!svc) {
     return { success: false, message: `Unknown service: ${serviceName}` };
+  }
+
+  // Demo mode - simulate success
+  if (await checkDemoMode()) {
+    return {
+      success: true,
+      message: `[Demo] ${svc.displayName} remediation simulated - no actual changes made`,
+    };
   }
 
   try {

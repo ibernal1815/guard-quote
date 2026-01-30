@@ -522,6 +522,17 @@
   font-weight: 600;
 }
 
+.demoBadge {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #000;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .closeBtn {
   background: #f1f5f9;
   border: none;
