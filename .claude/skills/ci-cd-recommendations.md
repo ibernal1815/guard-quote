@@ -709,4 +709,73 @@ bun run lint && bun run typecheck && bun run test && bun run build
 
 ---
 
+## Lessons Learned (Implementation Notes)
+
+### YAML Syntax in GitHub Actions
+- **Don't use `||` in run commands** - causes YAML parsing errors
+- Use `continue-on-error: true` instead for soft-fail steps
+- Example:
+  ```yaml
+  # BAD - YAML syntax error
+  run: bun run typecheck || echo "warnings"
+
+  # GOOD - proper soft-fail
+  run: bun run typecheck
+  continue-on-error: true
+  ```
+
+### Docker User Creation
+- **Bun image is Debian-based**, not Alpine
+- Use `groupadd`/`useradd` instead of `addgroup`/`adduser`
+- Example:
+  ```dockerfile
+  # BAD - Alpine commands (won't work in Bun image)
+  RUN addgroup --system nodejs && adduser --system bunjs
+
+  # GOOD - Debian commands
+  RUN groupadd --system --gid 1001 nodejs && \
+      useradd --system --uid 1001 --gid nodejs bunjs
+  ```
+
+### ESLint Unused Variables
+- `argsIgnorePattern: "^_"` only works for function arguments
+- Need ALL three patterns for full underscore support:
+  ```javascript
+  "@typescript-eslint/no-unused-vars": ["error", {
+    argsIgnorePattern: "^_",
+    varsIgnorePattern: "^_",
+    caughtErrorsIgnorePattern: "^_"
+  }]
+  ```
+
+### Biome Schema Version
+- Biome 2.x uses different schema than 1.x
+- Check installed version: `bunx biome --version`
+- Use matching schema: `https://biomejs.dev/schemas/2.0.0/schema.json`
+- `organizeImports` moved to different location in v2
+
+### TypeScript CSS Modules
+- TypeScript doesn't recognize `.module.css` imports by default
+- Either add declaration file or use `continue-on-error` in CI
+- For strict typing, create `src/types/css.d.ts`:
+  ```typescript
+  declare module "*.module.css" {
+    const classes: { [key: string]: string };
+    export default classes;
+  }
+  ```
+
+### Vitest React Testing
+- Console warnings about `act()` are normal, not failures
+- Use `vi.waitFor()` for async state updates
+- Mock `global.fetch` with `vi.fn()` for API tests
+
+### CI Pipeline Order
+- Run lint before typecheck (faster feedback)
+- Run tests after lint/typecheck pass
+- Build last (most expensive)
+- Docker builds can run in parallel with other jobs
+
+---
+
 *Last updated: January 30, 2026*
