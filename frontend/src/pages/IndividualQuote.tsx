@@ -206,11 +206,7 @@ export default function IndividualQuote() {
                 </div>
                 <div className={styles.field}>
                   <label>Phone</label>
-                  <input
-                    type="tel"
-                    placeholder="(555) 123-4567"
-                    {...register("phone")}
-                  />
+                  <input type="tel" placeholder="(555) 123-4567" {...register("phone")} />
                 </div>
               </div>
 
@@ -375,7 +371,10 @@ export default function IndividualQuote() {
               <h2 className={styles.sectionTitle}>🎯 Your security needs</h2>
 
               <div className={styles.field}>
-                <label>Monthly Budget: ${budget} <span className={styles.budgetTier}>({getBudgetLabel(budget)})</span></label>
+                <label>
+                  Monthly Budget: ${budget}{" "}
+                  <span className={styles.budgetTier}>({getBudgetLabel(budget)})</span>
+                </label>
                 <input
                   type="range"
                   min="10"
@@ -430,7 +429,12 @@ export default function IndividualQuote() {
         {/* Navigation */}
         <div className={styles.navigation}>
           {currentStep > 1 && (
-            <button type="button" className={styles.prevBtn} onClick={prevStep} disabled={submitting}>
+            <button
+              type="button"
+              className={styles.prevBtn}
+              onClick={prevStep}
+              disabled={submitting}
+            >
               ← Previous
             </button>
           )}

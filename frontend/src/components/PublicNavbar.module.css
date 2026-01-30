@@ -28,9 +28,15 @@
 }
 
 @keyframes navGlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* Brand */
@@ -162,7 +168,10 @@
     gap: 0.5rem;
   }
 
-  .loginBtn, .signupBtn, .authBtn, .logoutBtn {
+  .loginBtn,
+  .signupBtn,
+  .authBtn,
+  .logoutBtn {
     padding: 0.4rem 0.8rem;
     font-size: 0.75rem;
   }

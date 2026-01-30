@@ -44,7 +44,9 @@
     0 0 0 1px rgba(253, 185, 39, 0.4),
     0 0 24px rgba(253, 185, 39, 0.45);
 
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .authBtn:hover {
@@ -64,7 +66,9 @@
   border: none;
   cursor: pointer;
   box-shadow: 0 0 24px rgba(253, 185, 39, 0.45);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .authCtaBtn:hover {
@@ -96,12 +100,7 @@
   width: 100%;
   padding: 3rem;
 
-  background:
-    linear-gradient(
-      180deg,
-      rgba(40, 22, 65, 0.95),
-      rgba(18, 10, 32, 0.98)
-    );
+  background: linear-gradient(180deg, rgba(40, 22, 65, 0.95), rgba(18, 10, 32, 0.98));
 
   backdrop-filter: blur(18px);
   border-radius: 20px;
@@ -139,14 +138,26 @@
    ANIMATIONS
 ========================= */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes borderGlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* =========================
@@ -228,9 +239,18 @@
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); opacity: 0.9; }
-  50% { transform: scale(1.06); opacity: 1; }
-  100% { transform: scale(1); opacity: 0.9; }
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
 }
 
 /* =========================
@@ -260,7 +280,9 @@
   background: rgba(95, 50, 155, 0.24);
   border: 1px solid rgba(253, 185, 39, 0.22);
 
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .riskCard:hover,
@@ -381,7 +403,9 @@
   border: none;
   cursor: pointer;
 
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .downloadBtn:hover {

@@ -8,20 +8,17 @@ export default function Dashboard() {
   return (
     <BackgroundWrapper>
       <div className={styles.pageWrapper}>
-
         {/* =========================
            DASHBOARD CONTENT
         ========================= */}
         <main className={styles.dashboardContainer}>
-
           {/* HERO */}
           <section className={styles.hero}>
             <span className={styles.heroBadge}>LIVE SECURITY STATUS</span>
             <h1>Security Command Center</h1>
             <p>
-              Monitor posture, analyze organizational risk, and act on
-              expert-driven cybersecurity recommendations — all from a single,
-              unified control plane.
+              Monitor posture, analyze organizational risk, and act on expert-driven cybersecurity
+              recommendations — all from a single, unified control plane.
             </p>
           </section>
 
@@ -56,10 +53,7 @@ export default function Dashboard() {
           <section className={styles.section}>
             <div className={styles.sectionHeader}>
               <h2>Recent Reports</h2>
-              <button
-                className={styles.secondaryBtn}
-                onClick={() => navigate("/quote/business")}
-              >
+              <button className={styles.secondaryBtn} onClick={() => navigate("/quote/business")}>
                 Generate New Report
               </button>
             </div>
@@ -69,22 +63,17 @@ export default function Dashboard() {
                 <div key={r} className={styles.reportCard}>
                   <div className={styles.reportMeta}>
                     <span className={styles.reportTag}>Enterprise</span>
-                    <span className={styles.reportDate}>
-                      Dec {8 + r}, 2024
-                    </span>
+                    <span className={styles.reportDate}>Dec {8 + r}, 2024</span>
                   </div>
 
                   <h3>Cybersecurity Assessment #{r}</h3>
                   <p>
-                    Executive-level risk analysis covering endpoint, network,
-                    cloud, and identity security controls.
+                    Executive-level risk analysis covering endpoint, network, cloud, and identity
+                    security controls.
                   </p>
 
                   <div className={styles.reportActions}>
-                    <button
-                      className={styles.viewBtn}
-                      onClick={() => navigate("/report")}
-                    >
+                    <button className={styles.viewBtn} onClick={() => navigate("/report")}>
                       View Report
                     </button>
                     <button className={styles.iconBtn}>⬇</button>
@@ -100,28 +89,21 @@ export default function Dashboard() {
 
             <div className={styles.actionList}>
               <div className={styles.actionItem}>
-                <span className={`${styles.actionBadge} ${styles.high}`}>
-                  High
-                </span>
+                <span className={`${styles.actionBadge} ${styles.high}`}>High</span>
                 Deploy endpoint detection & response (EDR) across unmanaged devices
               </div>
 
               <div className={styles.actionItem}>
-                <span className={`${styles.actionBadge} ${styles.medium}`}>
-                  Medium
-                </span>
+                <span className={`${styles.actionBadge} ${styles.medium}`}>Medium</span>
                 Enforce conditional access and MFA for privileged accounts
               </div>
 
               <div className={styles.actionItem}>
-                <span className={`${styles.actionBadge} ${styles.medium}`}>
-                  Medium
-                </span>
+                <span className={`${styles.actionBadge} ${styles.medium}`}>Medium</span>
                 Establish incident response and breach notification playbooks
               </div>
             </div>
           </section>
-
         </main>
       </div>
     </BackgroundWrapper>

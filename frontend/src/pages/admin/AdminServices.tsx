@@ -33,7 +33,9 @@ export default function AdminServices() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
-  const [logs, setLogs] = useState<{ service: string; content: string; demoMode?: boolean } | null>(null);
+  const [logs, setLogs] = useState<{ service: string; content: string; demoMode?: boolean } | null>(
+    null
+  );
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [selectedService, setSelectedService] = useState<string | null>(null);
 
@@ -73,13 +75,17 @@ export default function AdminServices() {
     setTimeout(() => setToast(null), 4000);
   };
 
-  const handleAction = async (serviceName: string, action: "start" | "stop" | "restart" | "remediate") => {
+  const handleAction = async (
+    serviceName: string,
+    action: "start" | "stop" | "restart" | "remediate"
+  ) => {
     setActionInProgress(`${serviceName}-${action}`);
 
     try {
-      const url = action === "remediate"
-        ? `/api/admin/services/${serviceName}/remediate`
-        : `/api/admin/services/${serviceName}/${action}`;
+      const url =
+        action === "remediate"
+          ? `/api/admin/services/${serviceName}/remediate`
+          : `/api/admin/services/${serviceName}/${action}`;
 
       const res = await fetch(url, {
         method: "POST",
@@ -118,13 +124,18 @@ export default function AdminServices() {
     }
   };
 
-  const getStatusClass = (status: string) => {
+  const _getStatusClass = (status: string) => {
     switch (status) {
-      case "running": return styles.statusRunning;
-      case "stopped": return styles.statusStopped;
-      case "error": return styles.statusError;
-      case "planned": return styles.statusPlanned;
-      default: return styles.statusUnknown;
+      case "running":
+        return styles.statusRunning;
+      case "stopped":
+        return styles.statusStopped;
+      case "error":
+        return styles.statusError;
+      case "planned":
+        return styles.statusPlanned;
+      default:
+        return styles.statusUnknown;
     }
   };
 
@@ -137,19 +148,15 @@ export default function AdminServices() {
     );
   }
 
-  const runningCount = services.filter(s => s.status === "running").length;
-  const stoppedCount = services.filter(s => s.status === "stopped").length;
-  const errorCount = services.filter(s => s.status === "error").length;
-  const plannedCount = services.filter(s => s.status === "planned").length;
+  const runningCount = services.filter((s) => s.status === "running").length;
+  const stoppedCount = services.filter((s) => s.status === "stopped").length;
+  const errorCount = services.filter((s) => s.status === "error").length;
+  const plannedCount = services.filter((s) => s.status === "planned").length;
 
   return (
     <div className={styles.container}>
       {/* Toast Notification */}
-      {toast && (
-        <div className={`${styles.toast} ${styles[toast.type]}`}>
-          {toast.message}
-        </div>
-      )}
+      {toast && <div className={`${styles.toast} ${styles[toast.type]}`}>{toast.message}</div>}
 
       <div className={styles.header}>
         <div>
@@ -182,11 +189,15 @@ export default function AdminServices() {
             </div>
             <div className={styles.stat}>
               <span className={styles.statLabel}>Memory</span>
-              <span className={styles.statValue}>{systemInfo.memoryUsed} / {systemInfo.memoryTotal}</span>
+              <span className={styles.statValue}>
+                {systemInfo.memoryUsed} / {systemInfo.memoryTotal}
+              </span>
             </div>
             <div className={styles.stat}>
               <span className={styles.statLabel}>Disk</span>
-              <span className={styles.statValue}>{systemInfo.diskUsed} / {systemInfo.diskTotal}</span>
+              <span className={styles.statValue}>
+                {systemInfo.diskUsed} / {systemInfo.diskTotal}
+              </span>
             </div>
             <div className={styles.stat}>
               <span className={styles.statLabel}>Temp</span>
@@ -229,7 +240,9 @@ export default function AdminServices() {
               onClick={() => setSelectedService(isSelected ? null : service.name)}
               title={service.description}
             >
-              <div className={`${styles.led} ${styles[`led${service.status.charAt(0).toUpperCase() + service.status.slice(1)}`]}`} />
+              <div
+                className={`${styles.led} ${styles[`led${service.status.charAt(0).toUpperCase() + service.status.slice(1)}`]}`}
+              />
               <span className={styles.serviceName}>{service.displayName}</span>
               {service.port && <span className={styles.servicePort}>:{service.port}</span>}
             </div>
@@ -238,88 +251,93 @@ export default function AdminServices() {
       </div>
 
       {/* Selected Service Panel */}
-      {selectedService && (() => {
-        const service = services.find(s => s.name === selectedService);
-        if (!service) return null;
+      {selectedService &&
+        (() => {
+          const service = services.find((s) => s.name === selectedService);
+          if (!service) return null;
 
-        const isPlanned = service.status === "planned";
+          const isPlanned = service.status === "planned";
 
-        return (
-          <div className={`${styles.actionPanel} ${isPlanned ? styles.plannedPanel : ""}`}>
-            <div className={styles.panelHeader}>
-              <div className={styles.panelTitle}>
-                <div className={`${styles.led} ${styles[`led${service.status.charAt(0).toUpperCase() + service.status.slice(1)}`]}`} />
-                <span>{service.displayName}</span>
-                {isPlanned && <span className={styles.plannedTag}>Coming Soon</span>}
+          return (
+            <div className={`${styles.actionPanel} ${isPlanned ? styles.plannedPanel : ""}`}>
+              <div className={styles.panelHeader}>
+                <div className={styles.panelTitle}>
+                  <div
+                    className={`${styles.led} ${styles[`led${service.status.charAt(0).toUpperCase() + service.status.slice(1)}`]}`}
+                  />
+                  <span>{service.displayName}</span>
+                  {isPlanned && <span className={styles.plannedTag}>Coming Soon</span>}
+                </div>
+                <button className={styles.panelClose} onClick={() => setSelectedService(null)}>
+                  ×
+                </button>
               </div>
-              <button className={styles.panelClose} onClick={() => setSelectedService(null)}>×</button>
-            </div>
 
-            <p className={styles.panelDescription}>{service.description}</p>
+              <p className={styles.panelDescription}>{service.description}</p>
 
-            {!isPlanned && (
-              <>
+              {!isPlanned && (
+                <>
+                  <div className={styles.panelDetails}>
+                    {service.port && <span>Port {service.port}</span>}
+                    {service.uptime && <span>Up {service.uptime}</span>}
+                    {service.memory && <span>{service.memory}</span>}
+                    {service.cpu && <span>{service.cpu}</span>}
+                  </div>
+
+                  <div className={styles.panelActions}>
+                    {service.status === "running" ? (
+                      <>
+                        <button
+                          className={`${styles.actionBtn} ${styles.restartBtn}`}
+                          onClick={() => handleAction(service.name, "restart")}
+                          disabled={actionInProgress !== null}
+                        >
+                          {actionInProgress === `${service.name}-restart` ? "..." : "Restart"}
+                        </button>
+                        <button
+                          className={`${styles.actionBtn} ${styles.stopBtn}`}
+                          onClick={() => handleAction(service.name, "stop")}
+                          disabled={actionInProgress !== null}
+                        >
+                          {actionInProgress === `${service.name}-stop` ? "..." : "Stop"}
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        className={`${styles.actionBtn} ${styles.startBtn}`}
+                        onClick={() => handleAction(service.name, "start")}
+                        disabled={actionInProgress !== null}
+                      >
+                        {actionInProgress === `${service.name}-start` ? "..." : "Start"}
+                      </button>
+                    )}
+                    <button
+                      className={`${styles.actionBtn} ${styles.logsBtn}`}
+                      onClick={() => handleViewLogs(service.name)}
+                    >
+                      Logs
+                    </button>
+                    {service.status === "error" && (
+                      <button
+                        className={`${styles.actionBtn} ${styles.remediateBtn}`}
+                        onClick={() => handleAction(service.name, "remediate")}
+                        disabled={actionInProgress !== null}
+                      >
+                        {actionInProgress === `${service.name}-remediate` ? "..." : "Fix"}
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {isPlanned && service.port && (
                 <div className={styles.panelDetails}>
-                  {service.port && <span>Port {service.port}</span>}
-                  {service.uptime && <span>Up {service.uptime}</span>}
-                  {service.memory && <span>{service.memory}</span>}
-                  {service.cpu && <span>{service.cpu}</span>}
+                  <span>Port {service.port}</span>
                 </div>
-
-                <div className={styles.panelActions}>
-                  {service.status === "running" ? (
-                    <>
-                      <button
-                        className={`${styles.actionBtn} ${styles.restartBtn}`}
-                        onClick={() => handleAction(service.name, "restart")}
-                        disabled={actionInProgress !== null}
-                      >
-                        {actionInProgress === `${service.name}-restart` ? "..." : "Restart"}
-                      </button>
-                      <button
-                        className={`${styles.actionBtn} ${styles.stopBtn}`}
-                        onClick={() => handleAction(service.name, "stop")}
-                        disabled={actionInProgress !== null}
-                      >
-                        {actionInProgress === `${service.name}-stop` ? "..." : "Stop"}
-                      </button>
-                    </>
-                  ) : (
-                    <button
-                      className={`${styles.actionBtn} ${styles.startBtn}`}
-                      onClick={() => handleAction(service.name, "start")}
-                      disabled={actionInProgress !== null}
-                    >
-                      {actionInProgress === `${service.name}-start` ? "..." : "Start"}
-                    </button>
-                  )}
-                  <button
-                    className={`${styles.actionBtn} ${styles.logsBtn}`}
-                    onClick={() => handleViewLogs(service.name)}
-                  >
-                    Logs
-                  </button>
-                  {service.status === "error" && (
-                    <button
-                      className={`${styles.actionBtn} ${styles.remediateBtn}`}
-                      onClick={() => handleAction(service.name, "remediate")}
-                      disabled={actionInProgress !== null}
-                    >
-                      {actionInProgress === `${service.name}-remediate` ? "..." : "Fix"}
-                    </button>
-                  )}
-                </div>
-              </>
-            )}
-
-            {isPlanned && service.port && (
-              <div className={styles.panelDetails}>
-                <span>Port {service.port}</span>
-              </div>
-            )}
-          </div>
-        );
-      })()}
+              )}
+            </div>
+          );
+        })()}
 
       {/* Logs Modal */}
       {logs && (
@@ -328,7 +346,9 @@ export default function AdminServices() {
             <div className={styles.modalHeader}>
               <h2>Logs: {logs.service}</h2>
               {logs.demoMode && <span className={styles.demoBadge}>Demo Mode</span>}
-              <button className={styles.closeBtn} onClick={() => setLogs(null)}>×</button>
+              <button className={styles.closeBtn} onClick={() => setLogs(null)}>
+                ×
+              </button>
             </div>
             <pre className={styles.logsContent}>{logs.content || "No logs available"}</pre>
           </div>

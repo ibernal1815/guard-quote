@@ -54,12 +54,12 @@ export default function SignUp() {
 
       if (res.ok && data.success) {
         navigate("/admin/login", {
-          state: { error: "Account created! Please log in." }
+          state: { error: "Account created! Please log in." },
         });
       } else {
         setError(data.error || "Registration failed");
       }
-    } catch (err) {
+    } catch (_err) {
       setError("Network error. Please try again.");
     } finally {
       setLoading(false);

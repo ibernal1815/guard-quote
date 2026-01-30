@@ -32,14 +32,16 @@
 .logo {
   font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(90deg, #552583, #FDB927);
+  background: linear-gradient(90deg, #552583, #fdb927);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   white-space: nowrap;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.2s ease, filter 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
 }
 
 .logo:hover {
@@ -99,8 +101,8 @@
 
 .navItem.active {
   background: linear-gradient(90deg, rgba(85, 37, 131, 0.4), rgba(253, 185, 39, 0.2));
-  color: #FDB927;
-  border-left: 3px solid #FDB927;
+  color: #fdb927;
+  border-left: 3px solid #fdb927;
 }
 
 .navIcon {
@@ -136,7 +138,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #552583, #FDB927);
+  background: linear-gradient(135deg, #552583, #fdb927);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -225,7 +227,7 @@
 
 .newQuoteBtn {
   padding: 0.5rem 1rem;
-  background: linear-gradient(90deg, #552583, #FDB927);
+  background: linear-gradient(90deg, #552583, #fdb927);
   border-radius: 6px;
   color: white;
   font-weight: 500;

@@ -23,7 +23,7 @@ export function ServiceStatusProvider({ children }: { children: ReactNode }) {
   const checkServices = async () => {
     try {
       const res = await fetch("/api/status", {
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(5000),
       });
       if (res.ok) {
         const data = await res.json();

@@ -51,9 +51,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               key={item.path}
               to={item.path}
               end={item.path === "/admin"}
-              className={({ isActive }) =>
-                `${styles.navItem} ${isActive ? styles.active : ""}`
-              }
+              className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ""}`}
             >
               <span className={styles.navIcon}>{item.icon}</span>
               {!sidebarCollapsed && <span className={styles.navLabel}>{item.label}</span>}
@@ -64,7 +62,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <div className={styles.sidebarFooter}>
           <div className={styles.userInfo}>
             <div className={styles.userAvatar}>
-              {user?.firstName?.[0]}{user?.lastName?.[0]}
+              {user?.firstName?.[0]}
+              {user?.lastName?.[0]}
             </div>
             {!sidebarCollapsed && (
               <div className={styles.userDetails}>

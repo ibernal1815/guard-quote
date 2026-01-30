@@ -97,7 +97,7 @@ export function useQuoteWebSocket() {
       };
 
       wsRef.current = ws;
-    } catch (err) {
+    } catch (_err) {
       setStatus("error");
       setError("Failed to create WebSocket connection");
     }

@@ -94,12 +94,18 @@ export default function AdminQuoteRequests() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "pending": return "#fdb927";
-      case "reviewed": return "#3b82f6";
-      case "quoted": return "#8b5cf6";
-      case "accepted": return "#22c55e";
-      case "rejected": return "#ef4444";
-      default: return "#888";
+      case "pending":
+        return "#fdb927";
+      case "reviewed":
+        return "#3b82f6";
+      case "quoted":
+        return "#8b5cf6";
+      case "accepted":
+        return "#22c55e";
+      case "rejected":
+        return "#ef4444";
+      default:
+        return "#888";
     }
   };
 
@@ -139,7 +145,9 @@ export default function AdminQuoteRequests() {
           >
             <div className={styles.cardHeader}>
               <div className={styles.cardTitle}>
-                <strong>{req.first_name} {req.last_name}</strong>
+                <strong>
+                  {req.first_name} {req.last_name}
+                </strong>
                 <span className={styles.email}>{req.email}</span>
               </div>
               <span
@@ -198,51 +206,91 @@ export default function AdminQuoteRequests() {
               <section className={styles.section}>
                 <h3>Contact Info</h3>
                 <div className={styles.infoGrid}>
-                  <div><strong>Name:</strong> {selectedRequest.first_name} {selectedRequest.last_name}</div>
-                  <div><strong>Email:</strong> {selectedRequest.email}</div>
-                  <div><strong>Phone:</strong> {selectedRequest.phone || "N/A"}</div>
-                  <div><strong>Home Type:</strong> {selectedRequest.home_type || "N/A"}</div>
-                  <div><strong>Household:</strong> {selectedRequest.household_size || "N/A"}</div>
-                  <div><strong>Preferred Contact:</strong> {selectedRequest.preferred_contact}</div>
+                  <div>
+                    <strong>Name:</strong> {selectedRequest.first_name} {selectedRequest.last_name}
+                  </div>
+                  <div>
+                    <strong>Email:</strong> {selectedRequest.email}
+                  </div>
+                  <div>
+                    <strong>Phone:</strong> {selectedRequest.phone || "N/A"}
+                  </div>
+                  <div>
+                    <strong>Home Type:</strong> {selectedRequest.home_type || "N/A"}
+                  </div>
+                  <div>
+                    <strong>Household:</strong> {selectedRequest.household_size || "N/A"}
+                  </div>
+                  <div>
+                    <strong>Preferred Contact:</strong> {selectedRequest.preferred_contact}
+                  </div>
                 </div>
               </section>
 
               <section className={styles.section}>
                 <h3>Setup</h3>
                 <div className={styles.infoGrid}>
-                  <div><strong>Devices:</strong> {selectedRequest.device_count || "N/A"}</div>
-                  <div><strong>Primary Use:</strong> {selectedRequest.primary_use || "N/A"}</div>
-                  <div><strong>WFH:</strong> {selectedRequest.works_from_home || "N/A"}</div>
-                  <div><strong>Smart Home:</strong> {selectedRequest.has_smart_home ? "Yes" : "No"}</div>
+                  <div>
+                    <strong>Devices:</strong> {selectedRequest.device_count || "N/A"}
+                  </div>
+                  <div>
+                    <strong>Primary Use:</strong> {selectedRequest.primary_use || "N/A"}
+                  </div>
+                  <div>
+                    <strong>WFH:</strong> {selectedRequest.works_from_home || "N/A"}
+                  </div>
+                  <div>
+                    <strong>Smart Home:</strong> {selectedRequest.has_smart_home ? "Yes" : "No"}
+                  </div>
                 </div>
                 {selectedRequest.smart_home_details && (
-                  <p><strong>Smart Devices:</strong> {selectedRequest.smart_home_details}</p>
+                  <p>
+                    <strong>Smart Devices:</strong> {selectedRequest.smart_home_details}
+                  </p>
                 )}
               </section>
 
               <section className={styles.section}>
                 <h3>Security</h3>
                 <div className={styles.infoGrid}>
-                  <div><strong>Tech Comfort:</strong> {selectedRequest.technical_comfort || "N/A"}</div>
-                  <div><strong>Online Activity:</strong> {selectedRequest.online_activity || "N/A"}</div>
-                  <div><strong>Past Incidents:</strong> {selectedRequest.past_incidents ? "Yes" : "No"}</div>
+                  <div>
+                    <strong>Tech Comfort:</strong> {selectedRequest.technical_comfort || "N/A"}
+                  </div>
+                  <div>
+                    <strong>Online Activity:</strong> {selectedRequest.online_activity || "N/A"}
+                  </div>
+                  <div>
+                    <strong>Past Incidents:</strong> {selectedRequest.past_incidents ? "Yes" : "No"}
+                  </div>
                 </div>
-                {selectedRequest.current_protection && selectedRequest.current_protection.length > 0 && (
-                  <p><strong>Current Protection:</strong> {selectedRequest.current_protection.join(", ")}</p>
-                )}
+                {selectedRequest.current_protection &&
+                  selectedRequest.current_protection.length > 0 && (
+                    <p>
+                      <strong>Current Protection:</strong>{" "}
+                      {selectedRequest.current_protection.join(", ")}
+                    </p>
+                  )}
                 {selectedRequest.incident_details && (
-                  <p><strong>Incident Details:</strong> {selectedRequest.incident_details}</p>
+                  <p>
+                    <strong>Incident Details:</strong> {selectedRequest.incident_details}
+                  </p>
                 )}
               </section>
 
               <section className={styles.section}>
                 <h3>Needs</h3>
                 <div className={styles.infoGrid}>
-                  <div><strong>Budget:</strong> ${selectedRequest.budget}/mo</div>
-                  <div><strong>Urgency:</strong> {selectedRequest.urgency || "N/A"}</div>
+                  <div>
+                    <strong>Budget:</strong> ${selectedRequest.budget}/mo
+                  </div>
+                  <div>
+                    <strong>Urgency:</strong> {selectedRequest.urgency || "N/A"}
+                  </div>
                 </div>
                 {selectedRequest.security_concerns && (
-                  <p><strong>Concerns:</strong> {selectedRequest.security_concerns}</p>
+                  <p>
+                    <strong>Concerns:</strong> {selectedRequest.security_concerns}
+                  </p>
                 )}
               </section>
 
@@ -252,7 +300,9 @@ export default function AdminQuoteRequests() {
                   <label>Status</label>
                   <select value={newStatus} onChange={(e) => setNewStatus(e.target.value)}>
                     {STATUS_OPTIONS.map((s) => (
-                      <option key={s} value={s}>{s}</option>
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
                     ))}
                   </select>
                 </div>

@@ -21,10 +21,7 @@ export default function Navbar() {
       </nav>
 
       {/* RIGHT — AUTH */}
-      <button
-        className={styles.authBtn}
-        onClick={() => navigate("/login")}
-      >
+      <button className={styles.authBtn} onClick={() => navigate("/login")}>
         Log Out
       </button>
     </header>

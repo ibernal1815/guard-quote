@@ -94,9 +94,7 @@ export default function AdminUsers() {
     setError("");
 
     try {
-      const url = editingUser
-        ? `/api/admin/users/${editingUser.id}`
-        : "/api/admin/users";
+      const url = editingUser ? `/api/admin/users/${editingUser.id}` : "/api/admin/users";
 
       const res = await fetch(url, {
         method: editingUser ? "PATCH" : "POST",
@@ -220,11 +218,15 @@ export default function AdminUsers() {
               </div>
             </div>
 
-            <span className={`${styles.roleBadge} ${styles[`role${user.role.charAt(0).toUpperCase() + user.role.slice(1)}`]}`}>
+            <span
+              className={`${styles.roleBadge} ${styles[`role${user.role.charAt(0).toUpperCase() + user.role.slice(1)}`]}`}
+            >
               {user.role}
             </span>
 
-            <span className={`${styles.statusBadge} ${user.is_active ? styles.statusActive : styles.statusInactive}`}>
+            <span
+              className={`${styles.statusBadge} ${user.is_active ? styles.statusActive : styles.statusInactive}`}
+            >
               {user.is_active ? "Active" : "Inactive"}
             </span>
 
@@ -233,11 +235,7 @@ export default function AdminUsers() {
             </span>
 
             <div className={styles.actions}>
-              <button
-                className={styles.actionBtn}
-                onClick={() => openEditModal(user)}
-                title="Edit"
-              >
+              <button className={styles.actionBtn} onClick={() => openEditModal(user)} title="Edit">
                 ✏️
               </button>
               <button
@@ -272,10 +270,7 @@ export default function AdminUsers() {
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h2>{editingUser ? "Edit User" : "Create User"}</h2>
-              <button
-                className={styles.closeBtn}
-                onClick={() => setShowModal(false)}
-              >
+              <button className={styles.closeBtn} onClick={() => setShowModal(false)}>
                 ×
               </button>
             </div>
@@ -287,9 +282,7 @@ export default function AdminUsers() {
                   <input
                     type="text"
                     value={formData.firstName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, firstName: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                     required
                   />
                 </div>
@@ -298,9 +291,7 @@ export default function AdminUsers() {
                   <input
                     type="text"
                     value={formData.lastName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, lastName: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                     required
                   />
                 </div>
@@ -311,9 +302,7 @@ export default function AdminUsers() {
                 <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
                   disabled={!!editingUser}
                 />
@@ -325,9 +314,7 @@ export default function AdminUsers() {
                   <input
                     type="password"
                     value={formData.password}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     placeholder="Leave empty for default"
                   />
                 </div>
@@ -337,9 +324,7 @@ export default function AdminUsers() {
                 <label>Role</label>
                 <select
                   value={formData.role}
-                  onChange={(e) =>
-                    setFormData({ ...formData, role: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                 >
                   <option value="user">User</option>
                   <option value="sales">Sales</option>
@@ -355,11 +340,7 @@ export default function AdminUsers() {
                 >
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className={styles.submitBtn}
-                  disabled={saving}
-                >
+                <button type="submit" className={styles.submitBtn} disabled={saving}>
                   {saving ? "Saving..." : editingUser ? "Update" : "Create"}
                 </button>
               </div>

@@ -18,7 +18,7 @@
 
   background:
     radial-gradient(circle at 30% 25%, rgba(120, 50, 255, 0.35), transparent 60%),
-    radial-gradient(circle at 70% 75%, rgba(253, 185, 39, 0.30), transparent 65%),
+    radial-gradient(circle at 70% 75%, rgba(253, 185, 39, 0.3), transparent 65%),
     radial-gradient(circle at 85% 35%, rgba(140, 60, 255, 0.28), transparent 70%);
 
   filter: blur(55px);
@@ -28,9 +28,18 @@
 }
 
 @keyframes nebulaFloat {
-  0% { transform: scale(1) translate(0,0); opacity: 0.85; }
-  50% { transform: scale(1.2) translate(-20px, 15px); opacity: 1; }
-  100% { transform: scale(1) translate(10px, -10px); opacity: 0.9; }
+  0% {
+    transform: scale(1) translate(0, 0);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.2) translate(-20px, 15px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translate(10px, -10px);
+    opacity: 0.9;
+  }
 }
 
 /* ---------------------------
@@ -70,9 +79,15 @@
 }
 
 @keyframes gridPulse {
-  0% { opacity: 0.15; }
-  50% { opacity: 0.28; }
-  100% { opacity: 0.15; }
+  0% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.28;
+  }
+  100% {
+    opacity: 0.15;
+  }
 }
 
 /* ---------------------------
@@ -93,8 +108,12 @@
 }
 
 @keyframes scanMove {
-  from { transform: translateY(0px); }
-  to { transform: translateY(6px); }
+  from {
+    transform: translateY(0px);
+  }
+  to {
+    transform: translateY(6px);
+  }
 }
 
 /* ---------------------------
@@ -111,8 +130,12 @@
 }
 
 @keyframes drift {
-  0% { transform: translate(0,0); }
-  100% { transform: translate(40px,60px); }
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(40px, 60px);
+  }
 }
 
 /* CONTENT LAYER */

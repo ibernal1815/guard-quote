@@ -2,15 +2,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import styles from "./BusinessQuote.module.css";
 
-const COMPLIANCE_OPTIONS = [
-  "HIPAA",
-  "GDPR",
-  "PCI-DSS",
-  "SOX",
-  "CCPA",
-  "ISO/IEC 27001",
-  "Other",
-];
+const COMPLIANCE_OPTIONS = ["HIPAA", "GDPR", "PCI-DSS", "SOX", "CCPA", "ISO/IEC 27001", "Other"];
 
 type FormData = {
   companySize: string;
@@ -43,7 +35,7 @@ export default function BusinessQuote() {
   const industry = watch("industry");
   const complianceTypes = watch("complianceTypes");
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = (_data: FormData) => {
     navigate("/loading");
 
     setTimeout(() => {
@@ -53,13 +45,11 @@ export default function BusinessQuote() {
 
   return (
     <div className={styles.pageWrapper}>
-      
       <button className={styles.backBtn} onClick={() => navigate("/")}>
         ← Back
       </button>
 
       <form className={styles.formBox} onSubmit={handleSubmit(onSubmit)}>
-
         <h1 className={styles.title}>Business Security Quote</h1>
         <p className={styles.subtitle}>
           Provide key details — our system will generate a tailored enterprise cybersecurity plan.
@@ -106,9 +96,15 @@ export default function BusinessQuote() {
         <div className={styles.field}>
           <label>Compliance Requirements</label>
           <div className={styles.radioGroup}>
-            <label><input type="radio" value="yes" {...register("hasCompliance")} /> Yes</label>
-            <label><input type="radio" value="no" {...register("hasCompliance")} /> No</label>
-            <label><input type="radio" value="not-sure" {...register("hasCompliance")} /> Not sure</label>
+            <label>
+              <input type="radio" value="yes" {...register("hasCompliance")} /> Yes
+            </label>
+            <label>
+              <input type="radio" value="no" {...register("hasCompliance")} /> No
+            </label>
+            <label>
+              <input type="radio" value="not-sure" {...register("hasCompliance")} /> Not sure
+            </label>
           </div>
         </div>
 
@@ -134,15 +130,22 @@ export default function BusinessQuote() {
         <div className={styles.field}>
           <label>Remote / Hybrid Workforce?</label>
           <div className={styles.radioGroup}>
-            <label><input type="radio" value="yes" {...register("hasRemoteWorkforce")} /> Yes</label>
-            <label><input type="radio" value="no" {...register("hasRemoteWorkforce")} /> No</label>
+            <label>
+              <input type="radio" value="yes" {...register("hasRemoteWorkforce")} /> Yes
+            </label>
+            <label>
+              <input type="radio" value="no" {...register("hasRemoteWorkforce")} /> No
+            </label>
           </div>
         </div>
 
         {/* Current Solutions */}
         <div className={styles.field}>
           <label>Current Security Stack (Optional)</label>
-          <textarea placeholder="e.g. Cisco Firewall, CrowdStrike EDR..." {...register("currentSolutions")} />
+          <textarea
+            placeholder="e.g. Cisco Firewall, CrowdStrike EDR..."
+            {...register("currentSolutions")}
+          />
         </div>
 
         {/* Budget */}

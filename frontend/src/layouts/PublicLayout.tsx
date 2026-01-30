@@ -7,9 +7,7 @@ export default function PublicLayout({ children }) {
   return (
     <BackgroundWrapper>
       <PublicNavbar />
-      <div style={{ paddingTop: "68px" }}>
-        {children}
-      </div>
+      <div style={{ paddingTop: "68px" }}>{children}</div>
       <FooterMinimal />
     </BackgroundWrapper>
   );

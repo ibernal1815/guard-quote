@@ -22,17 +22,25 @@
   border: 6px solid rgba(255, 255, 255, 0.18);
   border-top-color: #fdb927;
 
-  animation: spin 1s linear infinite, glow 1.6s ease-in-out infinite alternate;
+  animation:
+    spin 1s linear infinite,
+    glow 1.6s ease-in-out infinite alternate;
   margin-bottom: 1.4rem;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes glow {
-  from { box-shadow: 0 0 18px rgba(253, 185, 39, 0.35); }
-  to   { box-shadow: 0 0 45px rgba(253, 185, 39, 0.9); }
+  from {
+    box-shadow: 0 0 18px rgba(253, 185, 39, 0.35);
+  }
+  to {
+    box-shadow: 0 0 45px rgba(253, 185, 39, 0.9);
+  }
 }
 
 /* Main text */

@@ -55,9 +55,15 @@
 }
 
 @keyframes borderShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* =========================
@@ -150,8 +156,12 @@
   background: rgba(255, 255, 255, 0.15);
 }
 
-.divider::before { left: 0; }
-.divider::after { right: 0; }
+.divider::before {
+  left: 0;
+}
+.divider::after {
+  right: 0;
+}
 
 .divider span {
   background: rgba(18, 12, 28, 0.9);
@@ -275,6 +285,12 @@ input:focus {
    ANIMATION
 ========================= */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

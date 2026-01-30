@@ -147,11 +147,7 @@
   padding: 1.6rem;
   border-radius: 14px;
 
-  background: linear-gradient(
-    180deg,
-    rgba(40, 25, 65, 0.85),
-    rgba(20, 12, 35, 0.95)
-  );
+  background: linear-gradient(180deg, rgba(40, 25, 65, 0.85), rgba(20, 12, 35, 0.95));
 
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);

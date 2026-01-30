@@ -33,7 +33,7 @@ function generateReport(data: QuoteData) {
   const hasFirewall = data.currentProtection?.includes("firewall");
   const hasPasswordManager = data.currentProtection?.includes("passwordManager");
   const has2FA = data.currentProtection?.includes("2fa");
-  const hasNothing = data.currentProtection?.includes("none") || !data.currentProtection?.length;
+  const _hasNothing = data.currentProtection?.includes("none") || !data.currentProtection?.length;
 
   // Calculate security score based on current protection
   let score = 40; // Base score
@@ -47,7 +47,8 @@ function generateReport(data: QuoteData) {
   score = Math.min(100, Math.max(20, score));
 
   // Determine risk level
-  const riskLevel = score >= 80 ? "Low" : score >= 60 ? "Moderate" : score >= 40 ? "High" : "Critical";
+  const riskLevel =
+    score >= 80 ? "Low" : score >= 60 ? "Moderate" : score >= 40 ? "High" : "Critical";
 
   // Generate risks based on missing protection
   const risks: { title: string; desc: string; severity: string }[] = [];
@@ -117,7 +118,8 @@ function generateReport(data: QuoteData) {
   }
 
   // Generate recommendations based on budget and needs
-  const recommendations: { solution: string; benefit: string; cost: string; priority: string }[] = [];
+  const recommendations: { solution: string; benefit: string; cost: string; priority: string }[] =
+    [];
   const monthlyBudget = data.budget || 50;
 
   // Essential recommendations
@@ -143,7 +145,8 @@ function generateReport(data: QuoteData) {
     if (monthlyBudget >= 75) {
       recommendations.push({
         solution: "NordVPN or ExpressVPN",
-        benefit: "Enterprise-grade encryption for all internet traffic, especially for remote work.",
+        benefit:
+          "Enterprise-grade encryption for all internet traffic, especially for remote work.",
         cost: "$12/month",
         priority: data.worksFromHome ? "Essential" : "Recommended",
       });
@@ -197,7 +200,10 @@ function generateReport(data: QuoteData) {
     recommendations.push({
       solution: "Family Safety Controls",
       benefit: "Content filtering and screen time management for children's devices.",
-      cost: monthlyBudget >= 75 ? "Included with Norton 360 ($100/yr)" : "Free with OpenDNS Family Shield",
+      cost:
+        monthlyBudget >= 75
+          ? "Included with Norton 360 ($100/yr)"
+          : "Free with OpenDNS Family Shield",
       priority: "Recommended",
     });
   }
@@ -243,7 +249,11 @@ function generateReport(data: QuoteData) {
   return {
     name: `${data.firstName} ${data.lastName}`,
     email: data.email,
-    date: new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
+    date: new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }),
     score,
     riskLevel,
     summary,
@@ -281,10 +291,7 @@ export default function Report() {
             <div className={styles.noData}>
               <h2>No Quote Data Found</h2>
               <p>Please complete the quote form to generate your personalized security report.</p>
-              <button
-                className={styles.downloadBtn}
-                onClick={() => navigate("/quote/individual")}
-              >
+              <button className={styles.downloadBtn} onClick={() => navigate("/quote/individual")}>
                 Start Quote →
               </button>
             </div>
@@ -303,19 +310,27 @@ export default function Report() {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case "high": return "#ef4444";
-      case "medium": return "#f97316";
-      case "low": return "#22c55e";
-      default: return "#888";
+      case "high":
+        return "#ef4444";
+      case "medium":
+        return "#f97316";
+      case "low":
+        return "#22c55e";
+      default:
+        return "#888";
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "Essential": return "#ef4444";
-      case "Recommended": return "#fdb927";
-      case "Enhanced": return "#3b82f6";
-      default: return "#888";
+      case "Essential":
+        return "#ef4444";
+      case "Recommended":
+        return "#fdb927";
+      case "Enhanced":
+        return "#3b82f6";
+      default:
+        return "#888";
     }
   };
 
@@ -348,7 +363,10 @@ export default function Report() {
             <h2>Security Score</h2>
             <div className={styles.scoreBox} style={{ borderColor: getScoreColor(report.score) }}>
               <span style={{ color: getScoreColor(report.score) }}>{report.score}</span>/100
-              <div className={styles.riskBadge} style={{ backgroundColor: getScoreColor(report.score) }}>
+              <div
+                className={styles.riskBadge}
+                style={{ backgroundColor: getScoreColor(report.score) }}
+              >
                 {report.riskLevel} Risk
               </div>
             </div>
@@ -376,9 +394,7 @@ export default function Report() {
 
           <section className={styles.section}>
             <h2>Recommended Solutions</h2>
-            <p className={styles.budgetNote}>
-              Based on your ${report.monthlyBudget}/month budget
-            </p>
+            <p className={styles.budgetNote}>Based on your ${report.monthlyBudget}/month budget</p>
             <div className={styles.solutionGrid}>
               {report.recommendations.map((rec, index) => (
                 <div key={index} className={styles.solutionCard}>
@@ -405,10 +421,7 @@ export default function Report() {
                 <div key={i} className={styles.budgetItem}>
                   <span>{b.area}</span>
                   <div className={styles.budgetBar}>
-                    <div
-                      className={styles.budgetFill}
-                      style={{ width: `${b.value}%` }}
-                    />
+                    <div className={styles.budgetFill} style={{ width: `${b.value}%` }} />
                   </div>
                   <span>{b.value}%</span>
                 </div>
@@ -425,10 +438,7 @@ export default function Report() {
             <button className={styles.downloadBtn} onClick={() => window.print()}>
               Print Report
             </button>
-            <button
-              className={styles.downloadBtn}
-              onClick={() => navigate("/quote/individual")}
-            >
+            <button className={styles.downloadBtn} onClick={() => navigate("/quote/individual")}>
               Update Answers
             </button>
           </footer>

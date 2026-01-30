@@ -9,9 +9,7 @@ export default function UserPortal() {
   // =========================
   // FEDERATED LOGIN (DEMO)
   // =========================
-  const handleFederatedLogin = (
-    provider: "google" | "github" | "microsoft"
-  ) => {
+  const handleFederatedLogin = (provider: "google" | "github" | "microsoft") => {
     console.log(`Federated login with ${provider}`);
 
     // TODO: replace with Auth0 / Clerk / Cognito callback

@@ -29,8 +29,14 @@
 
 /* Fade-in animation */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Title */
@@ -39,7 +45,7 @@
   font-weight: 900;
   letter-spacing: -1px;
 
-  background: linear-gradient(90deg, #552583, #FDB927 75%);
+  background: linear-gradient(90deg, #552583, #fdb927 75%);
   -webkit-background-clip: text;
   color: transparent;
 
@@ -49,8 +55,12 @@
 }
 
 @keyframes titleGlow {
-  0%   { filter: drop-shadow(0 0 12px rgba(253,185,39,0.25)); }
-  100% { filter: drop-shadow(0 0 25px rgba(93,33,204,0.35)); }
+  0% {
+    filter: drop-shadow(0 0 12px rgba(253, 185, 39, 0.25));
+  }
+  100% {
+    filter: drop-shadow(0 0 25px rgba(93, 33, 204, 0.35));
+  }
 }
 
 /* Subtitle */
@@ -109,15 +119,17 @@
   padding: 0.75rem 1.4rem;
   border-radius: 8px;
 
-  background: linear-gradient(90deg, #552583, #FDB927);
+  background: linear-gradient(90deg, #552583, #fdb927);
   background-size: 200%;
   color: #fff;
 
   font-weight: 700;
   text-decoration: none;
 
-  transition: background-position 0.3s ease, transform 0.25s ease,
-              box-shadow 0.3s ease;
+  transition:
+    background-position 0.3s ease,
+    transform 0.25s ease,
+    box-shadow 0.3s ease;
 }
 
 .btn:hover {

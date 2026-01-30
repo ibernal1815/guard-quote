@@ -22,32 +22,28 @@ export default function PublicNavbar() {
       <div className={styles.authGroup}>
         {user ? (
           <>
-            <span className={styles.greeting}>Hello, <strong>{user.firstName}</strong></span>
-            <button
-              className={styles.authBtn}
-              onClick={() => navigate("/admin")}
-            >
+            <span className={styles.greeting}>
+              Hello, <strong>{user.firstName}</strong>
+            </span>
+            <button className={styles.authBtn} onClick={() => navigate("/admin")}>
               Dashboard
             </button>
             <button
               className={styles.logoutBtn}
-              onClick={() => { logout(); navigate("/"); }}
+              onClick={() => {
+                logout();
+                navigate("/");
+              }}
             >
               Logout
             </button>
           </>
         ) : (
           <>
-            <button
-              className={styles.loginBtn}
-              onClick={() => navigate("/admin/login")}
-            >
+            <button className={styles.loginBtn} onClick={() => navigate("/admin/login")}>
               Login
             </button>
-            <button
-              className={styles.signupBtn}
-              onClick={() => navigate("/signup")}
-            >
+            <button className={styles.signupBtn} onClick={() => navigate("/signup")}>
               Sign Up
             </button>
           </>

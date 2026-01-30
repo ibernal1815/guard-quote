@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useQuoteWebSocket } from "../hooks/useQuoteWebSocket";
 import { useServiceStatus } from "../context/ServiceStatusContext";
-import { mlApi, api, MLQuoteResponse, RiskAssessmentResponse } from "../services/api";
+import { mlApi, MLQuoteResponse, RiskAssessmentResponse } from "../services/api";
 import styles from "./SecurityQuote.module.css";
 
 const DRAFT_KEY = "guardquote_draft";
@@ -39,23 +39,41 @@ type FormData = {
   contactPhone: string;
 };
 
-function generateDemoQuote(data: FormData): { quote: MLQuoteResponse; risk: RiskAssessmentResponse } {
+function generateDemoQuote(data: FormData): {
+  quote: MLQuoteResponse;
+  risk: RiskAssessmentResponse;
+} {
   const eventType = EVENT_TYPES.find((e) => e.value === data.eventType) || EVENT_TYPES[0];
   const baseRate = eventType.baseRate;
   let subtotal = baseRate * data.hours * data.numGuards;
   if (data.isArmed) subtotal += 15 * data.hours * data.numGuards;
   if (data.requiresVehicle) subtotal += 50 * data.numGuards;
   const riskScore =
-    data.crowdSize > 1000 ? 0.75 : data.crowdSize > 500 ? 0.5 : ["concert", "sports"].includes(data.eventType) ? 0.45 : 0.3;
-  const riskLevel = riskScore >= 0.75 ? "critical" : riskScore >= 0.5 ? "high" : riskScore >= 0.25 ? "medium" : "low";
+    data.crowdSize > 1000
+      ? 0.75
+      : data.crowdSize > 500
+        ? 0.5
+        : ["concert", "sports"].includes(data.eventType)
+          ? 0.45
+          : 0.3;
+  const riskLevel =
+    riskScore >= 0.75
+      ? "critical"
+      : riskScore >= 0.5
+        ? "high"
+        : riskScore >= 0.25
+          ? "medium"
+          : "low";
   const factors: string[] = [];
-  if (["concert", "sports"].includes(data.eventType)) factors.push(`High-activity event: ${data.eventType}`);
+  if (["concert", "sports"].includes(data.eventType))
+    factors.push(`High-activity event: ${data.eventType}`);
   if (data.crowdSize > 500) factors.push(`Large crowd: ${data.crowdSize.toLocaleString()} people`);
   if (data.isArmed) factors.push("Armed security requested");
   if (!factors.length) factors.push("Standard risk profile");
   const recommendations: string[] = [];
   if (riskScore >= 0.5) recommendations.push("Consider additional guards");
-  if (data.crowdSize > 500 && !data.isArmed) recommendations.push("Armed security recommended for large crowds");
+  if (data.crowdSize > 500 && !data.isArmed)
+    recommendations.push("Armed security recommended for large crowds");
   if (!recommendations.length) recommendations.push("Standard protocols apply");
   return {
     quote: {
@@ -73,7 +91,12 @@ function generateDemoQuote(data: FormData): { quote: MLQuoteResponse; risk: Risk
         has_vehicle: data.requiresVehicle,
       },
     },
-    risk: { risk_level: riskLevel as "low" | "medium" | "high" | "critical", risk_score: riskScore, factors, recommendations },
+    risk: {
+      risk_level: riskLevel as "low" | "medium" | "high" | "critical",
+      risk_score: riskScore,
+      factors,
+      recommendations,
+    },
   };
 }
 
@@ -95,7 +118,6 @@ export default function SecurityQuote() {
     register,
     handleSubmit,
     watch,
-    control,
     formState: { errors },
     setValue,
     getValues,
@@ -283,7 +305,8 @@ export default function SecurityQuote() {
     }
   };
 
-  const eventTypeLabel = EVENT_TYPES.find((e) => e.value === formValues.eventType)?.label || formValues.eventType;
+  const eventTypeLabel =
+    EVENT_TYPES.find((e) => e.value === formValues.eventType)?.label || formValues.eventType;
   const livePrice = wsQuote?.final_price ?? quote?.final_price;
 
   return (
@@ -294,7 +317,9 @@ export default function SecurityQuote() {
           {hasDraft && <span className={styles.draftBadge}>Draft Saved</span>}
         </h1>
         <p className={styles.subtitle}>
-          {status.mlEngine === "online" ? "ML-powered instant pricing" : "Demo Mode - estimates are approximate"}
+          {status.mlEngine === "online"
+            ? "ML-powered instant pricing"
+            : "Demo Mode - estimates are approximate"}
         </p>
 
         {/* Wizard Progress */}
@@ -327,18 +352,30 @@ export default function SecurityQuote() {
                       </option>
                     ))}
                   </select>
-                  {errors.eventType && <span className={styles.fieldError}>{errors.eventType.message}</span>}
+                  {errors.eventType && (
+                    <span className={styles.fieldError}>{errors.eventType.message}</span>
+                  )}
                 </div>
                 <div className={styles.row}>
                   <div className={styles.field}>
                     <label>Event Date</label>
-                    <input type="date" {...register("eventDate", { required: "Date is required" })} />
-                    {errors.eventDate && <span className={styles.fieldError}>{errors.eventDate.message}</span>}
+                    <input
+                      type="date"
+                      {...register("eventDate", { required: "Date is required" })}
+                    />
+                    {errors.eventDate && (
+                      <span className={styles.fieldError}>{errors.eventDate.message}</span>
+                    )}
                   </div>
                   <div className={styles.field}>
                     <label>Start Time</label>
-                    <input type="time" {...register("eventTime", { required: "Time is required" })} />
-                    {errors.eventTime && <span className={styles.fieldError}>{errors.eventTime.message}</span>}
+                    <input
+                      type="time"
+                      {...register("eventTime", { required: "Time is required" })}
+                    />
+                    {errors.eventTime && (
+                      <span className={styles.fieldError}>{errors.eventTime.message}</span>
+                    )}
                   </div>
                 </div>
               </>
@@ -359,7 +396,9 @@ export default function SecurityQuote() {
                       pattern: { value: /^\d{5}$/, message: "Enter a valid 5-digit ZIP" },
                     })}
                   />
-                  {errors.locationZip && <span className={styles.fieldError}>{errors.locationZip.message}</span>}
+                  {errors.locationZip && (
+                    <span className={styles.fieldError}>{errors.locationZip.message}</span>
+                  )}
                 </div>
                 <div className={styles.field}>
                   <label>Expected Attendance</label>
@@ -367,9 +406,14 @@ export default function SecurityQuote() {
                     type="number"
                     min={0}
                     placeholder="Number of attendees"
-                    {...register("crowdSize", { valueAsNumber: true, min: { value: 0, message: "Must be 0 or more" } })}
+                    {...register("crowdSize", {
+                      valueAsNumber: true,
+                      min: { value: 0, message: "Must be 0 or more" },
+                    })}
                   />
-                  {errors.crowdSize && <span className={styles.fieldError}>{errors.crowdSize.message}</span>}
+                  {errors.crowdSize && (
+                    <span className={styles.fieldError}>{errors.crowdSize.message}</span>
+                  )}
                 </div>
               </>
             )}
@@ -391,7 +435,9 @@ export default function SecurityQuote() {
                         max: { value: 50, message: "Max 50 guards" },
                       })}
                     />
-                    {errors.numGuards && <span className={styles.fieldError}>{errors.numGuards.message}</span>}
+                    {errors.numGuards && (
+                      <span className={styles.fieldError}>{errors.numGuards.message}</span>
+                    )}
                   </div>
                   <div className={styles.field}>
                     <label>Hours Needed</label>
@@ -407,7 +453,9 @@ export default function SecurityQuote() {
                         max: { value: 24, message: "Max 24 hours" },
                       })}
                     />
-                    {errors.hours && <span className={styles.fieldError}>{errors.hours.message}</span>}
+                    {errors.hours && (
+                      <span className={styles.fieldError}>{errors.hours.message}</span>
+                    )}
                   </div>
                 </div>
                 <div className={styles.checkboxRow}>
@@ -468,11 +516,19 @@ export default function SecurityQuote() {
           {currentStep >= 2 && (
             <div className={styles.livePrice}>
               <div className={styles.livePriceLabel}>Estimated Total</div>
-              <div className={`${styles.livePriceValue} ${isCalculating ? styles.livePriceCalculating : ""}`}>
-                {isCalculating ? "Calculating..." : livePrice ? `$${livePrice.toLocaleString()}` : "---"}
+              <div
+                className={`${styles.livePriceValue} ${isCalculating ? styles.livePriceCalculating : ""}`}
+              >
+                {isCalculating
+                  ? "Calculating..."
+                  : livePrice
+                    ? `$${livePrice.toLocaleString()}`
+                    : "---"}
               </div>
               <div className={styles.wsStatus}>
-                <span className={`${styles.wsStatusDot} ${isConnected ? styles.connected : ""}`}></span>
+                <span
+                  className={`${styles.wsStatusDot} ${isConnected ? styles.connected : ""}`}
+                ></span>
                 {isConnected ? "Live pricing" : "Connecting..."}
               </div>
             </div>
@@ -481,7 +537,11 @@ export default function SecurityQuote() {
           {/* Navigation */}
           <div className={styles.wizardNav}>
             {currentStep > 1 && (
-              <button type="button" className={`${styles.navBtn} ${styles.navBtnPrev}`} onClick={prevStep}>
+              <button
+                type="button"
+                className={`${styles.navBtn} ${styles.navBtnPrev}`}
+                onClick={prevStep}
+              >
                 Back
               </button>
             )}
@@ -510,7 +570,9 @@ export default function SecurityQuote() {
         <div className={styles.resultSection}>
           <div className={styles.quoteCard}>
             <h2>Price Estimate</h2>
-            <div className={styles.priceMain}>${quote.final_price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+            <div className={styles.priceMain}>
+              ${quote.final_price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            </div>
             <div className={styles.priceDetails}>
               <div>
                 <span>Base Price</span>
@@ -533,10 +595,15 @@ export default function SecurityQuote() {
           {risk && (
             <div className={styles.riskCard}>
               <h2>Risk Assessment</h2>
-              <div className={styles.riskLevel} style={{ backgroundColor: getRiskColor(risk.risk_level ?? "medium") }}>
+              <div
+                className={styles.riskLevel}
+                style={{ backgroundColor: getRiskColor(risk.risk_level ?? "medium") }}
+              >
                 {(risk.risk_level ?? "MEDIUM").toUpperCase()}
               </div>
-              <div className={styles.riskScore}>Risk Score: {((risk.risk_score ?? 0) * 100).toFixed(0)}%</div>
+              <div className={styles.riskScore}>
+                Risk Score: {((risk.risk_score ?? 0) * 100).toFixed(0)}%
+              </div>
               <div className={styles.factorsList}>
                 <h3>Risk Factors</h3>
                 <ul>

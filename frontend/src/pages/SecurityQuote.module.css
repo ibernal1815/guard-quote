@@ -15,7 +15,7 @@
 .title {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
-  background: linear-gradient(90deg, #552583, #FDB927);
+  background: linear-gradient(90deg, #552583, #fdb927);
   -webkit-background-clip: text;
   color: transparent;
 }
@@ -57,7 +57,7 @@
 .field input:focus,
 .field select:focus {
   outline: none;
-  border-color: #FDB927;
+  border-color: #fdb927;
   box-shadow: 0 0 0 2px rgba(253, 185, 39, 0.2);
 }
 
@@ -89,7 +89,7 @@
 .checkbox input {
   width: 18px;
   height: 18px;
-  accent-color: #FDB927;
+  accent-color: #fdb927;
 }
 
 .checkbox span {
@@ -100,11 +100,13 @@
   width: 100%;
   padding: 1rem;
   border-radius: 8px;
-  background: linear-gradient(90deg, #552583, #FDB927);
+  background: linear-gradient(90deg, #552583, #fdb927);
   color: white;
   font-size: 1.1rem;
   font-weight: 600;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .submitBtn:hover:not(:disabled) {
@@ -143,7 +145,7 @@
 .riskCard h2 {
   font-size: 1.25rem;
   margin-bottom: 1rem;
-  color: #FDB927;
+  color: #fdb927;
 }
 
 .priceMain {
@@ -151,7 +153,7 @@
   font-weight: 700;
   text-align: center;
   margin: 1rem 0;
-  background: linear-gradient(90deg, #fff, #FDB927);
+  background: linear-gradient(90deg, #fff, #fdb927);
   -webkit-background-clip: text;
   color: transparent;
 }
@@ -178,7 +180,7 @@
   background: rgba(85, 37, 131, 0.3);
   border-radius: 20px;
   font-size: 0.85rem;
-  color: #FDB927;
+  color: #fdb927;
 }
 
 .demoBadge {
@@ -298,14 +300,14 @@
 }
 
 .stepActive .stepNumber {
-  background: linear-gradient(135deg, #552583, #FDB927);
-  border-color: #FDB927;
+  background: linear-gradient(135deg, #552583, #fdb927);
+  border-color: #fdb927;
   box-shadow: 0 0 15px rgba(253, 185, 39, 0.4);
 }
 
 .stepActive .stepLabel {
   opacity: 1;
-  color: #FDB927;
+  color: #fdb927;
 }
 
 .stepComplete .stepNumber {
@@ -345,7 +347,7 @@
 }
 
 .navBtnNext {
-  background: linear-gradient(90deg, #552583, #FDB927);
+  background: linear-gradient(90deg, #552583, #fdb927);
   margin-left: auto;
 }
 
@@ -378,7 +380,7 @@
 .livePriceValue {
   font-size: 1.8rem;
   font-weight: 700;
-  background: linear-gradient(90deg, #fff, #FDB927);
+  background: linear-gradient(90deg, #fff, #fdb927);
   -webkit-background-clip: text;
   color: transparent;
 }
@@ -388,8 +390,13 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .wsStatus {

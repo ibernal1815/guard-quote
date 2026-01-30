@@ -78,12 +78,18 @@ export default function AdminDashboard() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "pending": return "#fdb927";
-      case "reviewed": return "#3b82f6";
-      case "quoted": return "#8b5cf6";
-      case "accepted": return "#22c55e";
-      case "rejected": return "#ef4444";
-      default: return "#888";
+      case "pending":
+        return "#fdb927";
+      case "reviewed":
+        return "#3b82f6";
+      case "quoted":
+        return "#8b5cf6";
+      case "accepted":
+        return "#22c55e";
+      case "rejected":
+        return "#ef4444";
+      default:
+        return "#888";
     }
   };
 
@@ -127,7 +133,9 @@ export default function AdminDashboard() {
       {/* Header with greeting */}
       <div className={styles.header}>
         <div className={styles.greeting}>
-          <h1>{getGreeting()}, {user?.firstName || "Admin"}</h1>
+          <h1>
+            {getGreeting()}, {user?.firstName || "Admin"}
+          </h1>
           <p>Here's what's happening with GuardQuote today.</p>
         </div>
         <div className={styles.headerDate}>
@@ -144,7 +152,8 @@ export default function AdminDashboard() {
         <div className={styles.alertBanner} onClick={() => navigate("/admin/quotes")}>
           <span className={styles.alertIcon}>🔔</span>
           <span>
-            <strong>{pendingRequests.length}</strong> new quote request{pendingRequests.length !== 1 ? "s" : ""} waiting for review
+            <strong>{pendingRequests.length}</strong> new quote request
+            {pendingRequests.length !== 1 ? "s" : ""} waiting for review
           </span>
           <span className={styles.alertArrow}>→</span>
         </div>
@@ -153,7 +162,13 @@ export default function AdminDashboard() {
       {/* Stats Grid */}
       <div className={styles.statsGrid}>
         <div className={styles.statCard} onClick={() => navigate("/admin/quotes")}>
-          <div className={styles.statIcon} style={{ background: "linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.3))" }}>
+          <div
+            className={styles.statIcon}
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.3))",
+            }}
+          >
             📝
           </div>
           <div className={styles.statContent}>
@@ -166,19 +181,28 @@ export default function AdminDashboard() {
         </div>
 
         <div className={styles.statCard}>
-          <div className={styles.statIcon} style={{ background: "linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(22, 163, 74, 0.3))" }}>
+          <div
+            className={styles.statIcon}
+            style={{
+              background: "linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(22, 163, 74, 0.3))",
+            }}
+          >
             💰
           </div>
           <div className={styles.statContent}>
-            <span className={styles.statValue}>
-              ${(stats?.totalRevenue || 0).toLocaleString()}
-            </span>
+            <span className={styles.statValue}>${(stats?.totalRevenue || 0).toLocaleString()}</span>
             <span className={styles.statLabel}>Total Revenue</span>
           </div>
         </div>
 
         <div className={styles.statCard} onClick={() => navigate("/admin/clients")}>
-          <div className={styles.statIcon} style={{ background: "linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.3))" }}>
+          <div
+            className={styles.statIcon}
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.3))",
+            }}
+          >
             👥
           </div>
           <div className={styles.statContent}>
@@ -188,7 +212,13 @@ export default function AdminDashboard() {
         </div>
 
         <div className={styles.statCard} onClick={() => navigate("/admin/users")}>
-          <div className={styles.statIcon} style={{ background: "linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(124, 58, 237, 0.3))" }}>
+          <div
+            className={styles.statIcon}
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(124, 58, 237, 0.3))",
+            }}
+          >
             🔐
           </div>
           <div className={styles.statContent}>
@@ -213,7 +243,9 @@ export default function AdminDashboard() {
             <div className={styles.emptyState}>
               <span className={styles.emptyIcon}>📭</span>
               <p>No quote requests yet</p>
-              <span className={styles.emptyHint}>They'll appear here when users submit the quote form</span>
+              <span className={styles.emptyHint}>
+                They'll appear here when users submit the quote form
+              </span>
             </div>
           ) : (
             <div className={styles.requestsList}>
@@ -224,7 +256,8 @@ export default function AdminDashboard() {
                   onClick={() => navigate("/admin/quotes")}
                 >
                   <div className={styles.requestAvatar}>
-                    {req.first_name[0]}{req.last_name[0]}
+                    {req.first_name[0]}
+                    {req.last_name[0]}
                   </div>
                   <div className={styles.requestInfo}>
                     <span className={styles.requestName}>
@@ -301,7 +334,8 @@ export default function AdminDashboard() {
           <div className={styles.statusOverview}>
             {["pending", "reviewed", "quoted", "accepted", "rejected"].map((status) => {
               const count = quoteRequests.filter((r) => r.status === status).length;
-              const percentage = quoteRequests.length > 0 ? (count / quoteRequests.length) * 100 : 0;
+              const percentage =
+                quoteRequests.length > 0 ? (count / quoteRequests.length) * 100 : 0;
               return (
                 <div key={status} className={styles.statusItem}>
                   <div className={styles.statusHeader}>

@@ -15,9 +15,7 @@ export default function FooterMinimal() {
       <span>© {new Date().getFullYear()} GuardQuote</span>
 
       <div className={styles.statusGroup}>
-        {status.demoMode && (
-          <span className={styles.demoMode}>Demo Mode</span>
-        )}
+        {status.demoMode && <span className={styles.demoMode}>Demo Mode</span>}
 
         <div className={styles.statusIndicator}>
           <span

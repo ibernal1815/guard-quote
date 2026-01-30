@@ -28,11 +28,23 @@ export default function AdminGuard({ children }: AdminGuardProps) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/admin/login" state={{ from: location, error: "Please log in to access this page" }} replace />;
+    return (
+      <Navigate
+        to="/admin/login"
+        state={{ from: location, error: "Please log in to access this page" }}
+        replace
+      />
+    );
   }
 
   if (!isAdmin) {
-    return <Navigate to="/admin/login" state={{ error: "You don't have permission to access this page" }} replace />;
+    return (
+      <Navigate
+        to="/admin/login"
+        state={{ error: "You don't have permission to access this page" }}
+        replace
+      />
+    );
   }
 
   return <>{children}</>;

@@ -112,7 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(data.user);
 
       return { success: true };
-    } catch (error) {
+    } catch (_error) {
       return { success: false, error: "Network error" };
     }
   }, []);

@@ -7,13 +7,9 @@ export default function Loading() {
       <div className={styles.loadingContainer}>
         <div className={styles.loader}></div>
 
-        <h2 className={styles.message}>
-          Analyzing your security needs…
-        </h2>
+        <h2 className={styles.message}>Analyzing your security needs…</h2>
 
-        <p className={styles.subtext}>
-          Crafting a tailored recommendation
-        </p>
+        <p className={styles.subtext}>Crafting a tailored recommendation</p>
       </div>
     </BackgroundWrapper>
   );

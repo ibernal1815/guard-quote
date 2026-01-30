@@ -88,12 +88,16 @@ export default function StatusIndicator({ compact = false }: StatusIndicatorProp
         <div className={styles.dropdown}>
           <div className={styles.dropdownHeader}>
             <span>System Status</span>
-            <button className={styles.closeBtn} onClick={() => setExpanded(false)}>×</button>
+            <button className={styles.closeBtn} onClick={() => setExpanded(false)}>
+              ×
+            </button>
           </div>
 
           <div className={styles.statusItem}>
             <span className={styles.statusLabel}>Database</span>
-            <span className={`${styles.statusValue} ${status?.database.connected ? styles.connected : styles.disconnected}`}>
+            <span
+              className={`${styles.statusValue} ${status?.database.connected ? styles.connected : styles.disconnected}`}
+            >
               {status?.database.connected ? "Connected" : "Not Connected"}
               {status?.database.connected && status?.database.local && " (Local)"}
             </span>
@@ -101,7 +105,9 @@ export default function StatusIndicator({ compact = false }: StatusIndicatorProp
 
           <div className={styles.statusItem}>
             <span className={styles.statusLabel}>ML Engine</span>
-            <span className={`${styles.statusValue} ${status?.mlEngine.connected ? styles.connected : styles.disconnected}`}>
+            <span
+              className={`${styles.statusValue} ${status?.mlEngine.connected ? styles.connected : styles.disconnected}`}
+            >
               {status?.mlEngine.connected ? `v${status.mlEngine.version}` : "Not Connected"}
             </span>
           </div>

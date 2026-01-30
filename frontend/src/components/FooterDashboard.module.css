@@ -24,20 +24,21 @@
   right: 0;
   height: 2px;
 
-  background: linear-gradient(
-    90deg,
-    #5f23ff,
-    #fdb927,
-    #5f23ff
-  );
+  background: linear-gradient(90deg, #5f23ff, #fdb927, #5f23ff);
   background-size: 200% 200%;
   animation: footerGlow 6s linear infinite;
 }
 
 @keyframes footerGlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* Brand block */
