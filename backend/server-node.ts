@@ -104,25 +104,40 @@ app.post('/api/predict', async (c) => {
     const guards = parseInt(num_guards) || 1;
     const crowd = parseInt(crowd_size) || 100;
     
-    // Risk score (0-10)
+    // Crowd-based adjustments (industry standard: larger crowds need premium rates)
+    const crowdFactor = crowd <= 100 ? 1.0 :
+                        crowd <= 500 ? 1.05 :
+                        crowd <= 1000 ? 1.10 :
+                        crowd <= 2500 ? 1.15 :
+                        crowd <= 5000 ? 1.25 :
+                        crowd <= 10000 ? 1.35 : 1.50;
+    
+    // Risk score (0-10) with enhanced factors
     let riskScore = 3;
     if (riskZone === 'high') riskScore += 2;
-    if (riskZone === 'premium') riskScore += 1;
-    if (crowd > 1000) riskScore += 1;
+    else if (riskZone === 'critical') riskScore += 3;
+    else if (riskZone === 'premium') riskScore += 1;
+    if (riskMult >= 1.5) riskScore += 2;
+    else if (riskMult >= 1.3) riskScore += 1;
+    if (crowd > 2500) riskScore += 1;
     if (crowd > 5000) riskScore += 1;
     riskScore = Math.min(10, riskScore);
     
-    // Confidence
+    // Confidence scoring
     let confidence = 95;
     if (!loc) confidence -= 10;
     if (crowd > 10000) confidence -= 5;
     confidence = Math.max(70, confidence);
     
-    const hourlyRate = baseRate * riskMult * locationMod;
+    // Industry standard: guard ratio based on event risk
+    const guardRatio = riskMult >= 1.4 ? 100 : riskMult >= 1.2 ? 150 : 200;
+    const recommendedGuards = Math.max(2, Math.ceil(crowd / guardRatio));
+    
+    // Final price calculation with crowd factor
+    const hourlyRate = baseRate * riskMult * locationMod * crowdFactor;
     const totalPrice = hourlyRate * hours * guards;
     const priceLow = Math.round(totalPrice * 0.85 * 100) / 100;
     const priceHigh = Math.round(totalPrice * 1.15 * 100) / 100;
-    const recommendedGuards = Math.max(1, Math.ceil(crowd / 250));
     
     return c.json({
       prediction: {
@@ -143,7 +158,7 @@ app.post('/api/predict', async (c) => {
       },
       event_type: { code: eventType.code, name: eventType.name },
       location: loc ? { city: loc.city, state: loc.state, risk_zone: loc.risk_zone } : { city: location, state: 'Unknown', risk_zone: 'medium' },
-      model: { version: 'v2.0', type: 'formula-based' }
+      model: { version: 'v3.0', type: 'formula-based' }
     });
   } catch (e: any) { return c.json({ error: 'Prediction failed', details: e.message }, 500); }
 });
