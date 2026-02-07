@@ -4,369 +4,279 @@
 
 Get instant, accurate quotes for security services — from event security to executive protection.
 
-🌐 **Production:** https://guardquote.vandine.us  
-📊 **Admin:** https://guardquote.vandine.us/admin
+🌐 **Live Site:** https://guardquote.vandine.us  
+📊 **Admin Dashboard:** https://guardquote.vandine.us/admin  
+📋 **Project Board:** https://github.com/users/jag18729/projects/1
 
 ---
 
-## Overview
+## 👥 Team
 
-GuardQuote helps businesses get security quotes without the back-and-forth. Clients answer simple questions, our ML engine calculates fair pricing, and vetted professionals follow up within 24 hours.
-
-### Key Features
-
-| For Clients | For Admins |
-|-------------|------------|
-| ✅ 4-step quote wizard | 📊 Real-time dashboard |
-| ✅ Instant price estimates | 📋 Quote management |
-| ✅ No account required | 🧠 ML model controls |
-| ✅ Mobile responsive | 👥 User management |
-| | 🔧 Service monitoring |
-| | 📜 Request logging |
+| Name | Role | Responsibilities |
+|------|------|------------------|
+| **Rafael Garcia** | Lead Developer | App dev, CI/CD, ML, SSO/OAuth, networking & infrastructure |
+| **Milkias Kassa** | Documentation | Docs, project management, presentations, IAM writeups |
+| **Isaiah Bernal** | Security Ops | SIEM (Wazuh), bastion host, IDS/IPS, detection rules |
+| **Xavier Nguyen** | Documentation | Presentations, timeline, cost analysis, references |
 
 ---
 
-## Architecture
+## 🏗️ Architecture
+
+**Zero AWS. Zero monthly cost. Full ownership.**
 
 ```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                              INTERNET                                         │
-└──────────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              INTERNET                                        │
+└─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                         CLOUDFLARE EDGE                                       │
-│                                                                               │
-│   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────────────┐   │
-│   │   Cloudflare    │   │  guardquote-    │   │    vandine-tunnel       │   │
-│   │   Zero Trust    │   │  gateway        │   │                         │   │
-│   │   Access        │   │  (Worker)       │   │   Argo Tunnel to Pi1    │   │
-│   │                 │   │                 │   │                         │   │
-│   │  • Email auth   │   │  • Rate limit   │   │   guardquote.vandine.us │   │
-│   │  • Admin only   │   │  • API keys     │   │   → localhost:3002      │   │
-│   │                 │   │  • Logging      │   │   → localhost:80        │   │
-│   └─────────────────┘   └─────────────────┘   └─────────────────────────┘   │
-│                                                                               │
-└──────────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         CLOUDFLARE EDGE                                      │
+│                                                                              │
+│   ┌──────────────┐   ┌──────────────┐   ┌──────────────┐                   │
+│   │    Pages     │   │   Workers    │   │   Tunnel     │                   │
+│   │  (Frontend)  │   │ (API Gateway)│   │  (Ingress)   │                   │
+│   └──────────────┘   └──────────────┘   └──────────────┘                   │
+│                                                                              │
+│   ┌──────────────┐   ┌──────────────┐                                       │
+│   │    Access    │   │     DNS      │                                       │
+│   │ (Zero Trust) │   │ guardquote.  │                                       │
+│   │  Email OTP   │   │  vandine.us  │                                       │
+│   └──────────────┘   └──────────────┘                                       │
+└─────────────────────────────────────────────────────────────────────────────┘
                                     │
-                                    │ Secure Tunnel
+                            Secure Tunnel (QUIC)
+                                    │
                                     ▼
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                         PI CLUSTER (Home Lab)                                 │
-│                                                                               │
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      VANDINE HOME LAB (192.168.2.0/24)                       │
+│                                                                              │
 │   ┌─────────────────────────────────────────────────────────────────────┐   │
-│   │                    PI1 - Services Host                               │   │
-│   │                    192.168.2.70 (Raspbian 12)                        │   │
+│   │                    Pi1 - Application Server                          │   │
+│   │                    192.168.2.70 │ Ubuntu 25.10                       │   │
 │   │                                                                      │   │
-│   │   ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐           │   │
-│   │   │  nginx   │  │ GuardQt  │  │ Postgres │  │  Docker  │           │   │
-│   │   │   :80    │  │   API    │  │  :5432   │  │ Services │           │   │
-│   │   │          │  │  :3002   │  │          │  │          │           │   │
-│   │   │ Frontend │  │ Node.js  │  │ Quotes   │  │ Grafana  │           │   │
-│   │   │  React   │  │  Hono    │  │ Users    │  │ Prom/Loki│           │   │
-│   │   └──────────┘  └──────────┘  └──────────┘  └──────────┘           │   │
-│   │                                                                      │   │
-│   │   Files:                                                             │   │
-│   │   • Frontend: /var/www/guardquote/                                   │   │
-│   │   • Backend:  ~/guard-quote/backend/                                 │   │
-│   │   • Logs:     journalctl -u guardquote                               │   │
+│   │   ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐   │   │
+│   │   │ GuardQuote │  │ PostgreSQL │  │  Grafana   │  │ Prometheus │   │   │
+│   │   │    API     │  │   :5432    │  │   :3000    │  │   :9090    │   │   │
+│   │   │   :3002    │  │            │  │            │  │            │   │   │
+│   │   │ Deno+Hono  │  │  Database  │  │ Dashboards │  │  Metrics   │   │   │
+│   │   └────────────┘  └────────────┘  └────────────┘  └────────────┘   │   │
 │   └─────────────────────────────────────────────────────────────────────┘   │
-│                                                                               │
+│                                                                              │
 │   ┌─────────────────────────────────────────────────────────────────────┐   │
-│   │                    PI0 - Monitoring Host                             │   │
-│   │                    192.168.2.101 (Ubuntu 25.10)                      │   │
+│   │                    Pi0 - Monitoring & Logs                           │   │
+│   │                    192.168.2.101 │ Ubuntu 25.10                      │   │
 │   │                                                                      │   │
-│   │   • WireGuard VPN (:51820)    • NFS Server (:2049)                  │   │
-│   │   • Rsyslog (:514)            • GitHub Runner                        │   │
-│   │   • NetFlow (:2055)           • Node Exporter (:9100)               │   │
+│   │   ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐   │   │
+│   │   │   Vector   │  │   LDAP     │  │  rsyslog   │  │    NFS     │   │   │
+│   │   │   (Logs)   │  │   :389     │  │   :514     │  │   :2049    │   │   │
+│   │   └────────────┘  └────────────┘  └────────────┘  └────────────┘   │   │
 │   └─────────────────────────────────────────────────────────────────────┘   │
-│                                                                               │
-└──────────────────────────────────────────────────────────────────────────────┘
+│                                                                              │
+│   ┌──────────────┐                    ┌──────────────┐                      │
+│   │    PA-220    │◄── SNMP/Syslog ──►│     UDM      │                      │
+│   │   Firewall   │                    │    Router    │                      │
+│   │ 192.168.2.14 │                    │ 192.168.2.1  │                      │
+│   └──────────────┘                    └──────────────┘                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                            Tailscale Mesh (WireGuard)
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         SECURITY / SIEM                                      │
+│                                                                              │
+│   ┌──────────────────────────────────────────────────────────────────────┐  │
+│   │                      Wazuh SIEM (Isaiah)                              │  │
+│   │  • Agent-based log collection    • File integrity monitoring         │  │
+│   │  • Detection rules               • Vulnerability scanning            │  │
+│   │  • Security dashboards           • Incident response                 │  │
+│   └──────────────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Tech Stack
+## 💻 Tech Stack
 
-### Frontend (`/frontend`)
-| Technology | Purpose |
-|------------|---------|
-| React 18 | UI framework |
-| TypeScript | Type safety |
-| Vite | Build tool |
-| TailwindCSS | Styling |
-| React Router 7 | Navigation |
-| Lucide React | Icons |
-| Framer Motion | Animations |
+| Layer | Technology | Notes |
+|-------|------------|-------|
+| **Frontend** | React 18 + TypeScript + Vite + Tailwind | Cloudflare Pages |
+| **Backend** | Deno 2.6 + Hono | Replaced Bun (ARM compatibility) |
+| **Database** | PostgreSQL 16 | Self-hosted on Pi1 |
+| **Monitoring** | Grafana + Prometheus + Loki | Full observability stack |
+| **Log Pipeline** | Vector → Loki / Wazuh | Centralized logging |
+| **SIEM** | Wazuh (self-hosted) | Security monitoring |
+| **Auth** | bcrypt + JWT | Admin authentication |
+| **Edge** | Cloudflare Workers + Tunnel | Zero Trust access |
+| **Mesh VPN** | Tailscale | Site-to-site connectivity |
+| **DNS** | Cloudflare | guardquote.vandine.us |
 
-### Backend (Pi1)
-| Technology | Purpose |
-|------------|---------|
-| Node.js 22 | Runtime |
-| Hono | API framework |
-| PostgreSQL | Database |
-| bcrypt | Password hashing |
-| tsx | TypeScript execution |
-
-### Infrastructure
-| Service | Purpose |
-|---------|---------|
-| Cloudflare Tunnel | Secure ingress |
-| Cloudflare Access | Zero Trust auth |
-| Cloudflare Workers | API gateway |
-| Pi Cluster | Self-hosted compute |
+**Operational Cost: $0/month** ✨
 
 ---
 
-## ML Engine
+## 🚀 Quick Start
 
-### Current Model: v2.0 (Formula-Based)
+### Clone & Setup
 
+```bash
+git clone https://github.com/jag18729/guard-quote.git
+cd guard-quote/frontend
+npm install
+npm run dev
+# → http://localhost:5173
 ```
-Price = BaseRate × RiskMultiplier × LocationModifier × Hours × Guards
+
+### Build & Deploy
+
+```bash
+npm run build
+npx wrangler pages deploy dist --project-name=guardquote
 ```
 
-| Factor | Source | Example |
-|--------|--------|---------|
-| BaseRate | Event type lookup | Concert: $45/hr |
-| RiskMultiplier | Event risk level | High risk: 1.3x |
-| LocationModifier | City/region data | Hollywood: 1.35x |
-| Hours | User input | 8 hours |
-| Guards | Calculated/input | 4 guards |
-
-### Features
-- **Risk scoring** (0-10 scale)
-- **Confidence scores** (70-95%)
-- **Price ranges** (±15% estimates)
-- **Recommended guards** (crowd-based)
-
-### Training Data
-- 500+ historical quotes
-- 15 event types
-- 28 locations
-- Acceptance/rejection tracking
-
-### Admin Controls
-- View model status
-- Browse training data
-- Export datasets (JSON)
-- Rollback to previous versions
-- Trigger retraining
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for full dev workflow.
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 guard-quote/
-├── .github/
-│   ├── CODEOWNERS           # Auto-request reviews
-│   └── workflows/
-│       └── frontend-ci.yml  # CI for frontend
-├── frontend/                # React application
+├── frontend/                 # React + Vite application
 │   ├── src/
-│   │   ├── context/         # Auth state
-│   │   ├── layouts/         # Page shells
-│   │   └── pages/
-│   │       ├── Landing.tsx      # Public homepage
-│   │       ├── QuoteForm.tsx    # Quote wizard
-│   │       ├── Login.tsx        # Admin login
-│   │       └── admin/
-│   │           ├── Dashboard.tsx
-│   │           ├── QuoteRequests.tsx
-│   │           ├── ML.tsx       # ML management
-│   │           ├── Users.tsx
-│   │           ├── Services.tsx
-│   │           └── Logs.tsx
-│   ├── package.json
-│   └── vite.config.ts
-├── backend/                 # Node.js API (on Pi1)
-├── ml-engine/               # ML components
-├── CONTRIBUTING.md
+│   │   ├── components/       # Reusable UI (DataFlowDiagram, etc.)
+│   │   ├── pages/
+│   │   │   ├── Landing.tsx   # Public homepage
+│   │   │   ├── QuoteForm.tsx # Quote wizard
+│   │   │   └── admin/        # Admin dashboard pages
+│   │   ├── layouts/          # Page wrappers
+│   │   └── lib/              # Utilities
+│   └── package.json
+├── docs/                     # Documentation
+│   ├── TEAM-TASKS.md         # Current sprint tasks
+│   ├── QUICKSTART-ISAIAH.md  # SIEM onboarding
+│   └── SIEM-SETUP-ISAIAH.md  # Full SIEM guide
+├── scripts/                  # Automation
+├── .github/
+│   ├── workflows/            # CI/CD
+│   └── ISSUE_TEMPLATE/       # Issue templates
+├── CONTRIBUTING.md           # How to contribute
 └── README.md
 ```
 
 ---
 
-## Quick Start
+## 🔐 Access
 
-### Prerequisites
-- Node.js 20+ or Bun
-- Git
+### Sites
 
-### Development
+| Site | URL | Auth |
+|------|-----|------|
+| Client | https://guardquote.vandine.us/ | Public |
+| Quote Form | https://guardquote.vandine.us/quote | Public |
+| Admin | https://guardquote.vandine.us/admin | Login required |
+| Grafana | https://grafana.vandine.us | Cloudflare Access |
+
+### Admin Login
+
+```
+Email: admin@guardquote.com
+Password: admin123
+```
+
+### SSH (Team)
 
 ```bash
-# Clone
-git clone https://github.com/jag18729/guard-quote.git
-cd guard-quote/frontend
-
-# Install
-npm install
-
-# Run dev server (proxies to production API)
-npm run dev
-# → http://localhost:5173
-
-# Build
-npm run build
-```
-
-### Local API Development
-
-If working on the backend locally:
-```bash
-# Create .env.local in frontend/
-echo "VITE_API_URL=http://localhost:3002" > .env.local
-
-# Run frontend
-npm run dev
+# Via Tailscale (ask Rafa for invite)
+ssh rafaeljg@100.114.94.18    # pi0
+ssh johnmarston@100.66.167.62  # pi1
 ```
 
 ---
 
-## Deployment
+## 📊 Features
 
-### Frontend (to Pi1)
+### Client Portal
+- ✅ 4-step quote wizard
+- ✅ Instant ML-powered pricing
+- ✅ No account required
+- ✅ Mobile responsive
 
-```bash
-cd frontend
-npm run build
-scp -r dist/* pi1:/var/www/guardquote/
-```
+### Admin Dashboard
+- 📊 Real-time analytics
+- 📋 Quote management
+- 🧠 ML model controls
+- 👥 User management (RBAC)
+- 🔧 Service monitoring
+- 📡 Network operations
+- 📝 Blog & feature requests
 
-### Backend (on Pi1)
-
-```bash
-ssh pi1
-cd ~/guard-quote/backend
-sudo systemctl restart guardquote
-```
-
-### CI/CD
-
-GitHub Actions runs on every push:
-1. **Type check** - TypeScript validation
-2. **Build** - Vite production build
-3. **Artifacts** - Upload dist/ for 7 days
-
----
-
-## API Reference
-
-### Public Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/health` | Health check |
-| POST | `/api/predict` | Get price prediction |
-| POST | `/api/auth/login` | Admin authentication |
-
-### Admin Endpoints (auth required)
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/admin/stats` | Dashboard statistics |
-| GET | `/api/admin/quote-requests` | List all quotes |
-| PATCH | `/api/admin/quote-requests/:id` | Update quote status |
-| GET | `/api/admin/users` | List admin users |
-| POST | `/api/admin/users` | Create admin user |
-| GET | `/api/admin/services` | System services |
-| GET | `/api/admin/services/system` | Pi1 system metrics |
-| GET | `/api/admin/logs` | Request logs |
-| GET | `/api/admin/ml/status` | ML model status |
-| GET | `/api/admin/ml/training-data` | Training dataset |
-| GET | `/api/admin/ml/training-stats` | Training statistics |
-| POST | `/api/admin/ml/rollback` | Rollback model |
-| POST | `/api/admin/ml/retrain` | Trigger retraining |
-| GET | `/api/admin/ml/export` | Export training data |
-
-### Example: Price Prediction
-
-```bash
-curl -X POST https://guardquote.vandine.us/api/predict \
-  -H "Content-Type: application/json" \
-  -d '{
-    "event_type": "CONCERT",
-    "location": "Hollywood",
-    "duration_hours": 8,
-    "num_guards": 4,
-    "crowd_size": 2000
-  }'
-```
-
-Response:
-```json
-{
-  "prediction": {
-    "total_price": 2527.20,
-    "price_low": 2148.12,
-    "price_high": 2906.28,
-    "hourly_rate": 78.98,
-    "risk_score": 6,
-    "risk_level": "medium",
-    "confidence_score": 95,
-    "recommended_guards": 8
-  },
-  "event_type": { "code": "CONCERT", "name": "Concert/Live Music" },
-  "location": { "city": "Hollywood", "state": "CA", "risk_zone": "high" }
-}
-```
+### Infrastructure
+- 🗺️ Interactive data pipeline diagram
+- 📈 Prometheus + Grafana monitoring
+- 📝 Centralized logging (Vector → Loki)
+- 🛡️ SIEM integration (Wazuh)
+- 🔒 Zero Trust access (Cloudflare)
 
 ---
 
-## Branch Strategy
+## 🧠 ML Engine
+
+### Pricing Model v2.0
 
 ```
-main (production)     ← Protected: PR + approval + CI
-  │
-  └── dev (staging)   ← Integration branch
-        │
-        ├── feature/xyz
-        ├── fix/abc
-        └── ...
+Price = BaseRate × RiskMultiplier × LocationModifier × Hours × Guards
 ```
 
-| Branch | Purpose | Protection |
-|--------|---------|------------|
-| `main` | Production | PR required, 1 approval, CI must pass |
-| `dev` | Staging | Open for development |
-| `feature/*` | New features | PR to dev |
-| `fix/*` | Bug fixes | PR to dev |
+| Factor | Description |
+|--------|-------------|
+| BaseRate | Event type lookup table |
+| RiskMultiplier | Event risk level (1.0 - 1.5x) |
+| LocationModifier | City/region pricing |
+| Confidence | 70-95% based on data quality |
+
+### Training Data
+- 500+ historical quotes
+- 15 event types
+- 28 locations
 
 ---
 
-## Contributing
+## 📋 Current Sprint
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
-- Workflow guidelines
-- Code style
-- Do's and don'ts
-- Getting help
+See [docs/TEAM-TASKS.md](./docs/TEAM-TASKS.md) for:
+- Role assignments
+- Saturday meeting prep
+- Task checklist
 
----
+### Open Issues
 
-## Security
-
-- **Admin access**: Cloudflare Zero Trust (email verification)
-- **API protection**: Rate limiting via Cloudflare Worker
-- **Passwords**: bcrypt hashed
-- **Branch protection**: PRs required for production
-
-Report security issues to: john@vandine.us
+| Issue | Owner | Status |
+|-------|-------|--------|
+| [#8 SIEM Wazuh Integration](https://github.com/jag18729/guard-quote/issues/8) | Isaiah | In Progress |
+| [#9 Update Presentation](https://github.com/jag18729/guard-quote/issues/9) | Milkias, Xavier | Todo |
+| [#10 Site Review Feedback](https://github.com/jag18729/guard-quote/issues/10) | Milkias, Xavier | Todo |
 
 ---
 
-## Team
+## 🔗 Links
 
-| Role | Contact |
-|------|---------|
-| Project Lead | John (john@vandine.us) |
-| Infrastructure | Cloudflare + Pi Cluster |
-| Repository | https://github.com/jag18729/guard-quote |
+| Resource | URL |
+|----------|-----|
+| **Live Site** | https://guardquote.vandine.us |
+| **GitHub Repo** | https://github.com/jag18729/guard-quote |
+| **Project Board** | https://github.com/users/jag18729/projects/1 |
+| **Grafana** | https://grafana.vandine.us |
+| **API Origin** | https://guardquote-origin.vandine.us |
 
 ---
 
-## License
+## 📄 License
 
-Private - Vandine Infrastructure
+Private - California State University, Los Angeles - Capstone Project
+
+---
+
+*Last updated: 2026-02-06*
