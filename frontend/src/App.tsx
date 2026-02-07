@@ -15,6 +15,7 @@ import ML from "./pages/admin/ML";
 import Network from "./pages/admin/Network";
 import Blog from "./pages/admin/Blog";
 import Features from "./pages/admin/Features";
+import Profile from "./pages/admin/Profile";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -47,6 +48,7 @@ export default function App() {
         <Route path="network" element={<Network />} />
         <Route path="blog" element={<Blog />} />
         <Route path="features" element={<Features />} />
+        <Route path="profile" element={<Profile />} />
       </Route>
     </Routes>
   );
