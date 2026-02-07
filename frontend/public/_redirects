@@ -1,0 +1,5 @@
+# Proxy API calls to backend via tunnel
+/api/*  https://guardquote-origin.vandine.us/api/:splat  200
+
+# SPA fallback
+/*  /index.html  200

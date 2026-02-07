@@ -6,6 +6,7 @@ import { Shield, AlertCircle, Loader2 } from "lucide-react";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -16,7 +17,7 @@ export default function Login() {
     setError("");
     setLoading(true);
     
-    const success = await login(email, password);
+    const success = await login(email, password, rememberMe);
     setLoading(false);
     
     if (success) {
@@ -67,6 +68,19 @@ export default function Login() {
               placeholder="••••••••"
               required
             />
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="w-4 h-4 rounded border-border bg-surface text-accent focus:ring-accent focus:ring-offset-0"
+            />
+            <label htmlFor="rememberMe" className="text-sm text-text-secondary cursor-pointer">
+              Remember me for 30 days
+            </label>
           </div>
           
           <button
