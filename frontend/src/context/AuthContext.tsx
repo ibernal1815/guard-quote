@@ -11,63 +11,130 @@ interface User {
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
+  login: (email: string, password: string, rememberMe?: boolean) => Promise<boolean>;
+  logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Helper to get CSRF token from cookie
+function getCSRFToken(): string | null {
+  const match = document.cookie.match(/(?:^|; )gq_csrf=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+// Helper for authenticated fetch with credentials and CSRF
+async function authFetch(url: string, options: RequestInit = {}): Promise<Response> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  
+  // Add CSRF token for state-changing requests
+  const method = options.method?.toUpperCase() || "GET";
+  if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+    const csrfToken = getCSRFToken();
+    if (csrfToken) {
+      headers["X-CSRF-Token"] = csrfToken;
+    }
+  }
+
+  return fetch(url, {
+    ...options,
+    credentials: "include",
+    headers: {
+      ...headers,
+      ...options.headers,
+    },
+  });
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
   const [isLoading, setIsLoading] = useState(true);
 
+  // Check session on mount (using cookie or localStorage token)
   useEffect(() => {
-    if (token) {
-      fetch("/api/auth/me", { headers: { Authorization: `Bearer ${token}` } })
-        .then((res) => res.ok ? res.json() : Promise.reject())
-        .then((data) => setUser(data.user || data))
-        .catch(() => { setToken(null); localStorage.removeItem("token"); })
-        .finally(() => setIsLoading(false));
-    } else {
-      setIsLoading(false);
-    }
-  }, [token]);
+    const checkSession = async () => {
+      try {
+        // Try cookie-based auth first
+        const res = await authFetch("/api/auth/me");
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user || data);
+          setIsLoading(false);
+          return;
+        }
+        
+        // Fall back to localStorage token if cookie fails
+        if (token) {
+          const tokenRes = await fetch("/api/auth/me", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (tokenRes.ok) {
+            const data = await tokenRes.json();
+            setUser(data.user || data);
+            setIsLoading(false);
+            return;
+          }
+        }
+        
+        // No valid session
+        setUser(null);
+        setToken(null);
+        localStorage.removeItem("token");
+      } catch {
+        setUser(null);
+        setToken(null);
+        localStorage.removeItem("token");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+    checkSession();
+  }, []);
+
+  const login = async (email: string, password: string, rememberMe = false): Promise<boolean> => {
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await authFetch("/api/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, rememberMe }),
       });
       if (!res.ok) return false;
       const data = await res.json();
+      // Server sets httpOnly session cookie and csrf cookie
       setToken(data.token);
       setUser(data.user);
       localStorage.setItem("token", data.token);
+      if (rememberMe) {
+        localStorage.setItem("rememberMe", "1");
+      } else {
+        localStorage.removeItem("rememberMe");
+      }
       return true;
     } catch { return false; }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await authFetch("/api/auth/logout", { method: "POST" });
+    } catch { /* ignore */ }
     setUser(null);
     setToken(null);
     localStorage.removeItem("token");
   };
 
   const refreshUser = async () => {
-    if (token) {
-      try {
-        const res = await fetch("/api/auth/me", { headers: { Authorization: `Bearer ${token}` } });
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data.user || data);
-        }
-      } catch { /* ignore */ }
-    }
+    try {
+      const res = await authFetch("/api/auth/me");
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user || data);
+      }
+    } catch { /* ignore */ }
   };
 
   return (
@@ -83,7 +150,39 @@ export function useAuth() {
   return ctx;
 }
 
+// Legacy helper - still works via Authorization header
 export function getAuthHeaders(): HeadersInit {
   const token = localStorage.getItem("token");
-  return token ? { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
+  const csrfToken = getCSRFToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  if (csrfToken) headers["X-CSRF-Token"] = csrfToken;
+  return headers;
+}
+
+// Preferred way to make authenticated API calls
+export async function apiFetch(url: string, options: RequestInit = {}): Promise<Response> {
+  const token = localStorage.getItem("token");
+  const csrfToken = getCSRFToken();
+  
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  
+  // Add CSRF token for state-changing requests
+  const method = options.method?.toUpperCase() || "GET";
+  if (["POST", "PUT", "PATCH", "DELETE"].includes(method) && csrfToken) {
+    headers["X-CSRF-Token"] = csrfToken;
+  }
+
+  return fetch(url, {
+    ...options,
+    credentials: "include",
+    headers: {
+      ...headers,
+      ...options.headers,
+    },
+  });
 }

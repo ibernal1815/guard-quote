@@ -21,7 +21,7 @@ export default function AdminLayout() {
       .catch(() => setSystemStatus("offline"));
   }, []);
   
-  const handleLogout = () => { logout(); navigate("/login"); };
+  const handleLogout = async () => { await logout(); navigate("/login"); };
 
   const navItems = [
     { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true },

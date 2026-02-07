@@ -37,6 +37,7 @@ export default function Profile() {
     try {
       const res = await fetch("/api/auth/profile", {
         method: "PATCH",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -74,6 +75,7 @@ export default function Profile() {
     try {
       const res = await fetch("/api/auth/change-password", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
