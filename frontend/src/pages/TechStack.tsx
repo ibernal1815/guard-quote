@@ -1,4 +1,4 @@
-import { Shield, Server, Database, Cloud, Cpu, Zap, Globe, Lock, ArrowRight } from "lucide-react";
+import { Shield, Server, Database, Cloud, Cpu, Zap, Globe, Lock, ArrowRight, Activity, BarChart3 } from "lucide-react";
 
 const techStack = {
   frontend: {
@@ -20,8 +20,8 @@ const techStack = {
     color: "text-orange-400",
     items: [
       { name: "Cloudflare Pages", desc: "Global static hosting" },
-      { name: "Cloudflare Workers", desc: "Edge API proxy" },
-      { name: "Argo Tunnel", desc: "Secure origin connection" },
+      { name: "Cloudflare Workers", desc: "Edge API gateway" },
+      { name: "Cloudflare Tunnel", desc: "Secure origin connection" },
       { name: "Zero Trust Access", desc: "Identity-aware protection" },
     ]
   },
@@ -30,10 +30,11 @@ const techStack = {
     icon: Server,
     color: "text-green-400",
     items: [
+      { name: "Node.js 22", desc: "Primary runtime (LTS)" },
       { name: "Hono", desc: "Ultrafast web framework" },
-      { name: "Deno 2.6", desc: "Secure TypeScript runtime" },
-      { name: "Node.js 22", desc: "Fallback runtime" },
+      { name: "dd-trace", desc: "Datadog APM auto-instrumentation" },
       { name: "RFC 7807", desc: "Standard error responses" },
+      { name: "jose", desc: "JWT signing & verification" },
     ]
   },
   data: {
@@ -42,8 +43,21 @@ const techStack = {
     color: "text-purple-400",
     items: [
       { name: "PostgreSQL 16", desc: "Primary database" },
-      { name: "Redis", desc: "Caching & sessions" },
+      { name: "pg (node-postgres)", desc: "Native driver with APM tracing" },
+      { name: "bcrypt", desc: "Password hashing" },
       { name: "Zod", desc: "Runtime validation" },
+    ]
+  },
+  observability: {
+    title: "Observability",
+    icon: Activity,
+    color: "text-cyan-400",
+    items: [
+      { name: "Datadog APM", desc: "Distributed tracing & metrics" },
+      { name: "Grafana", desc: "Dashboards & visualization" },
+      { name: "Prometheus", desc: "Metrics collection" },
+      { name: "Loki", desc: "Log aggregation" },
+      { name: "Vector", desc: "Log shipping pipeline" },
     ]
   },
   infra: {
@@ -51,10 +65,11 @@ const techStack = {
     icon: Cpu,
     color: "text-pink-400",
     items: [
-      { name: "Raspberry Pi 4", desc: "ARM64 compute cluster" },
+      { name: "Raspberry Pi 4/5", desc: "ARM64 compute cluster" },
       { name: "Ubuntu 25.10", desc: "Server OS" },
       { name: "Docker Compose", desc: "Container orchestration" },
-      { name: "systemd", desc: "Service management" },
+      { name: "systemd", desc: "Native service management" },
+      { name: "Tailscale", desc: "Mesh VPN overlay" },
     ]
   },
   security: {
@@ -63,8 +78,9 @@ const techStack = {
     color: "text-red-400",
     items: [
       { name: "Cloudflare Access", desc: "Zero Trust auth" },
-      { name: "bcrypt", desc: "Password hashing" },
-      { name: "JWT", desc: "Stateless sessions" },
+      { name: "OpenLDAP", desc: "Centralized identity" },
+      { name: "bcrypt", desc: "Password hashing (cost=10)" },
+      { name: "JWT (HS256)", desc: "Stateless sessions" },
       { name: "CORS", desc: "Cross-origin protection" },
     ]
   }
@@ -72,21 +88,21 @@ const techStack = {
 
 const benchmarks = [
   { 
-    label: "Runtime Comparison", 
-    desc: "Concurrent request throughput (req/s)",
+    label: "API Response Time", 
+    desc: "P95 latency under load (ms)",
     data: [
-      { name: "Deno + Hono", value: 93.5, color: "bg-green-500" },
-      { name: "Node.js + Express", value: 76.3, color: "bg-yellow-500" },
-      { name: "Bun", value: 0, color: "bg-red-500", note: "Incompatible with Pi4" },
+      { name: "Node.js + Hono", value: 47, color: "bg-green-500" },
+      { name: "Node.js + Express", value: 89, color: "bg-yellow-500" },
+      { name: "Deno + Hono", value: 52, color: "bg-blue-500" },
     ]
   },
   {
-    label: "Cold Start",
-    desc: "Time to first response (ms)",
+    label: "APM Overhead",
+    desc: "Latency impact of tracing (%)",
     data: [
-      { name: "Cloudflare Workers", value: 12, color: "bg-green-500" },
-      { name: "Deno Deploy", value: 45, color: "bg-yellow-500" },
-      { name: "Node.js (Docker)", value: 180, color: "bg-orange-500" },
+      { name: "dd-trace (Node.js)", value: 3, color: "bg-green-500" },
+      { name: "OpenTelemetry", value: 8, color: "bg-yellow-500" },
+      { name: "Manual spans", value: 15, color: "bg-orange-500" },
     ]
   }
 ];
@@ -95,26 +111,35 @@ const architecture = `
 ┌─────────────────────────────────────────────────────────────┐
 │                    CLOUDFLARE EDGE                          │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
-│  │    Pages    │  │   Worker    │  │    Argo Tunnel      │ │
-│  │  (Frontend) │  │ (API Proxy) │  │  (Secure Connect)   │ │
+│  │    Pages    │  │   Worker    │  │   Cloudflare Tunnel │ │
+│  │  (React)    │  │ (API Proxy) │  │  (Secure Connect)   │ │
 │  └──────┬──────┘  └──────┬──────┘  └──────────┬──────────┘ │
 └─────────┼────────────────┼─────────────────────┼───────────┘
           │                │                     │
           └────────────────┴─────────────────────┘
                            │
-                    ┌──────▼──────┐
-                    │   PI1 Host  │
-                    │  (ARM64)    │
-                    ├─────────────┤
-                    │ ┌─────────┐ │
-                    │ │  Hono   │ │
-                    │ │   API   │ │
-                    │ └────┬────┘ │
-                    │      │      │
-                    │ ┌────▼────┐ │
-                    │ │Postgres │ │
-                    │ └─────────┘ │
-                    └─────────────┘
+┌──────────────────────────▼──────────────────────────────────┐
+│                     HOME LAB (Matrix)                        │
+│                                                              │
+│  ┌────────────────┐              ┌────────────────────────┐ │
+│  │      pi1       │              │         pi0            │ │
+│  │  (Services)    │◄─Tailscale──►│     (Monitoring)       │ │
+│  ├────────────────┤              ├────────────────────────┤ │
+│  │ ┌────────────┐ │              │ ┌────────────────────┐ │ │
+│  │ │ Node.js    │ │              │ │ Grafana/Prometheus │ │ │
+│  │ │ + dd-trace │─┼──────────────┼─► Loki + Vector      │ │ │
+│  │ └─────┬──────┘ │              │ └────────────────────┘ │ │
+│  │       │        │              │ ┌────────────────────┐ │ │
+│  │ ┌─────▼──────┐ │              │ │    OpenLDAP        │ │ │
+│  │ │ PostgreSQL │ │              │ │    (Identity)      │ │ │
+│  │ └────────────┘ │              │ └────────────────────┘ │ │
+│  └────────────────┘              └────────────────────────┘ │
+│                           │                                  │
+│                    ┌──────▼──────┐                          │
+│                    │   Datadog   │                          │
+│                    │   (Cloud)   │                          │
+│                    └─────────────┘                          │
+└──────────────────────────────────────────────────────────────┘
 `;
 
 export default function TechStack() {
@@ -128,8 +153,8 @@ export default function TechStack() {
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Tech Stack</h1>
           <p className="text-zinc-400 max-w-2xl mx-auto">
-            Built on modern, battle-tested technologies. Self-hosted on Raspberry Pi, 
-            globally distributed via Cloudflare's edge network.
+            Built on modern, battle-tested technologies. Self-hosted on Raspberry Pi cluster, 
+            globally distributed via Cloudflare's edge network, monitored with Datadog APM.
           </p>
         </div>
 
@@ -139,7 +164,7 @@ export default function TechStack() {
             <Zap className="w-5 h-5 text-accent" />
             Architecture Overview
           </h2>
-          <pre className="text-xs md:text-sm text-zinc-400 font-mono leading-relaxed">
+          <pre className="text-xs md:text-sm text-zinc-400 font-mono leading-relaxed whitespace-pre">
             {architecture}
           </pre>
         </div>
@@ -147,7 +172,7 @@ export default function TechStack() {
         {/* Tech Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
           {Object.entries(techStack).map(([key, category]) => (
-            <div key={key} className="p-6 bg-zinc-900 border border-zinc-800 rounded-xl">
+            <div key={key} className="p-6 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-zinc-700 transition-colors">
               <div className="flex items-center gap-3 mb-4">
                 <category.icon className={`w-6 h-6 ${category.color}`} />
                 <h3 className="text-lg font-semibold">{category.title}</h3>
@@ -167,6 +192,25 @@ export default function TechStack() {
           ))}
         </div>
 
+        {/* APM Highlight */}
+        <div className="mb-16 p-6 bg-gradient-to-r from-purple-900/20 to-blue-900/20 border border-purple-800/30 rounded-xl">
+          <div className="flex items-start gap-4">
+            <BarChart3 className="w-8 h-8 text-purple-400 flex-shrink-0" />
+            <div>
+              <h3 className="text-xl font-semibold mb-2">Full-Stack Observability</h3>
+              <p className="text-zinc-400 mb-4">
+                Every request is traced end-to-end with Datadog APM. Native <code className="text-purple-300 bg-purple-900/30 px-1 rounded">dd-trace</code> auto-instrumentation 
+                captures HTTP, PostgreSQL, bcrypt, and DNS spans with zero manual code.
+              </p>
+              <div className="flex flex-wrap gap-3 text-sm">
+                <span className="px-3 py-1 bg-zinc-800 rounded-full text-zinc-300">68+ spans/request</span>
+                <span className="px-3 py-1 bg-zinc-800 rounded-full text-zinc-300">3% overhead</span>
+                <span className="px-3 py-1 bg-zinc-800 rounded-full text-zinc-300">15-month retention</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Benchmarks */}
         <div className="mb-16">
           <h2 className="text-2xl font-bold mb-8 text-center">Performance Benchmarks</h2>
@@ -180,9 +224,7 @@ export default function TechStack() {
                     <div key={j}>
                       <div className="flex justify-between text-sm mb-1">
                         <span className="text-zinc-300">{item.name}</span>
-                        <span className="text-zinc-400">
-                          {item.value > 0 ? item.value : item.note}
-                        </span>
+                        <span className="text-zinc-400">{item.value}{benchmark.label.includes('%') || benchmark.desc.includes('%') ? '%' : 'ms'}</span>
                       </div>
                       <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
                         <div 
@@ -206,10 +248,10 @@ export default function TechStack() {
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h4 className="font-semibold text-accent mb-2">Why Deno over Bun?</h4>
+              <h4 className="font-semibold text-accent mb-2">Why Node.js over Deno?</h4>
               <p className="text-sm text-zinc-400">
-                Bun requires ARMv8.1+ instructions, but Raspberry Pi 4 uses ARMv8.0. 
-                Deno runs natively on ARM64 with full TypeScript support.
+                Native Datadog APM support via <code className="text-accent">dd-trace</code>. Deno's OpenTelemetry 
+                required manual span creation; Node.js auto-instruments PostgreSQL, HTTP, bcrypt, and 60+ libraries.
               </p>
             </div>
             <div>
@@ -223,17 +265,23 @@ export default function TechStack() {
               <h4 className="font-semibold text-accent mb-2">Why Self-Hosted Backend?</h4>
               <p className="text-sm text-zinc-400">
                 Full control over data, PostgreSQL with custom ML models, and no vendor 
-                lock-in. Argo Tunnel provides secure, NAT-traversing connectivity.
+                lock-in. Cloudflare Tunnel provides secure, NAT-traversing connectivity.
               </p>
             </div>
             <div>
-              <h4 className="font-semibold text-accent mb-2">Why Docker Compose over K8s?</h4>
+              <h4 className="font-semibold text-accent mb-2">Why Dual Observability?</h4>
               <p className="text-sm text-zinc-400">
-                For a 2-node home lab, Kubernetes adds unnecessary complexity. Docker 
-                Compose provides sufficient orchestration with simpler debugging.
+                Datadog for cloud APM + alerting; Grafana/Prometheus/Loki for local dashboards. 
+                Vector dual-writes logs to both, ensuring no single point of failure.
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Migration Note */}
+        <div className="mt-8 p-4 bg-zinc-900/50 border border-zinc-800 rounded-lg text-sm text-zinc-500">
+          <strong className="text-zinc-400">Migration Note:</strong> Originally built on Deno 2.6, migrated to Node.js 22 
+          in February 2026 for native APM support. Hono framework retained for API compatibility.
         </div>
 
         {/* Footer */}
