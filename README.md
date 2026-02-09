@@ -6,6 +6,7 @@ Get instant, accurate quotes for security services — from event security to ex
 
 🌐 **Live Site:** https://guardquote.vandine.us  
 📊 **Admin Dashboard:** https://guardquote.vandine.us/admin  
+🦇 **Ops Portal:** https://vandine-portal.pages.dev  
 📋 **Project Board:** https://github.com/users/jag18729/projects/1
 
 ---
