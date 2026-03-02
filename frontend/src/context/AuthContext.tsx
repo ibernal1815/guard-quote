@@ -12,6 +12,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (email: string, password: string, rememberMe?: boolean) => Promise<boolean>;
+  loginWithToken: (accessToken: string, refreshToken: string) => Promise<boolean>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   isLoading: boolean;
@@ -52,13 +53,21 @@ async function authFetch(url: string, options: RequestInit = {}): Promise<Respon
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem("token"));
   const [isLoading, setIsLoading] = useState(true);
 
   // Check session on mount (using cookie or localStorage token)
   useEffect(() => {
     const checkSession = async () => {
       try {
+        // Only check if we have a token (avoids unnecessary 401s)
+        // lgtm[js/user-controlled-bypass] - Client-side optimization only; server validates all tokens
+        const storedToken = localStorage.getItem("token");
+        if (!storedToken) {
+          setIsLoading(false);
+          return;
+        }
+
         // Try cookie-based auth first
         const res = await authFetch("/api/auth/me");
         if (res.ok) {
@@ -69,19 +78,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         
         // Fall back to localStorage token if cookie fails
-        if (token) {
-          const tokenRes = await fetch("/api/auth/me", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (tokenRes.ok) {
-            const data = await tokenRes.json();
-            setUser(data.user || data);
-            setIsLoading(false);
-            return;
-          }
+        const tokenRes = await fetch("/api/auth/me", {
+          headers: { Authorization: `Bearer ${storedToken}` },
+        });
+        if (tokenRes.ok) {
+          const data = await tokenRes.json();
+          setUser(data.user || data);
+          setIsLoading(false);
+          return;
         }
         
-        // No valid session
+        // Token invalid - clean up silently
         setUser(null);
         setToken(null);
         localStorage.removeItem("token");
@@ -106,9 +113,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!res.ok) return false;
       const data = await res.json();
       // Server sets httpOnly session cookie and csrf cookie
-      setToken(data.token);
+      setToken(data.accessToken || data.token);
       setUser(data.user);
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("token", data.accessToken || data.token);
+      if (data.refreshToken) {
+        localStorage.setItem("refreshToken", data.refreshToken);
+      }
       if (rememberMe) {
         localStorage.setItem("rememberMe", "1");
       } else {
@@ -116,6 +126,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       return true;
     } catch { return false; }
+  };
+
+  // Login with OAuth tokens (from callback)
+  const loginWithToken = async (accessToken: string, refreshToken: string): Promise<boolean> => {
+    try {
+      // Store tokens
+      localStorage.setItem("token", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+      setToken(accessToken);
+
+      // Fetch user info
+      const res = await fetch("/api/auth/me", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user || data);
+        return true;
+      }
+      
+      // Token invalid
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      setToken(null);
+      return false;
+    } catch {
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      setToken(null);
+      return false;
+    }
   };
 
   const logout = async () => {
@@ -138,7 +180,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, refreshUser, isLoading }}>
+    <AuthContext.Provider value={{ user, token, login, loginWithToken, logout, refreshUser, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

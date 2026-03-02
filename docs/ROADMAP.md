@@ -1,6 +1,6 @@
 # GuardQuote Roadmap & UAT Plan
 
-**Last Updated:** 2026-02-06  
+**Last Updated:** 2026-02-09  
 **Target:** Capstone Presentation (TBD - update date)
 
 ---
@@ -10,24 +10,27 @@
 ### Infrastructure (Rafa)
 - [x] Migrated off AWS entirely → Pi cluster
 - [x] Set up Cloudflare Tunnel + Zero Trust Access
-- [x] Deployed Deno + Hono backend (replaced Bun)
+- [x] Deployed Node.js + Hono backend (migrated from Deno)
+- [x] Integrated Datadog APM with dd-trace (68+ spans/request)
 - [x] Set up Prometheus + Grafana + Loki monitoring
+- [x] Deployed Datadog agents on all hosts (pi0, pi1, WSL)
 - [x] Configured SNMP monitoring (UDM + PA-220)
 - [x] Deployed SNMP Exporter on pi1
 - [x] All 16+ Prometheus targets UP
-- [x] Vector log pipeline on pi0
+- [x] Vector log pipeline on pi0 + Datadog
 - [x] Interactive data flow diagram (React Flow)
 
 ### Application (Rafa)
 - [x] Full admin dashboard with RBAC
-- [x] User management with roles (admin/developer)
-- [x] Quote management system
-- [x] ML Engine page with controls
+- [x] User management with roles (admin/developer/viewer)
+- [x] Quote management system (19 quotes)
+- [x] ML Engine page with controls (status, training, export)
 - [x] Network operations page (4 tabs)
-- [x] Blog + Feature requests
-- [x] Services health monitoring
+- [x] Blog + Feature requests + Comments
+- [x] Services health monitoring + Infrastructure control
 - [x] User activity logging
 - [x] GitHub Projects integration
+- [x] 50 API endpoints (full feature parity)
 
 ### Documentation (Rafa)
 - [x] Updated README with team + architecture
@@ -45,7 +48,7 @@
 
 ## 🗓️ Roadmap
 
-### Week 1: Feb 3-7 (Current) — Infrastructure & Integration
+### Week 1: Feb 3-7 — Infrastructure & Integration ✅
 
 | Day | Tasks | Owner | Status |
 |-----|-------|-------|--------|
@@ -54,9 +57,19 @@
 | Wed 2/5 | Admin dashboard, RBAC, GitHub sync | Rafa | ✅ Done |
 | Thu 2/6 | SNMP monitoring, data flow diagram, docs | Rafa | ✅ Done |
 | Fri 2/7 | Team meeting prep, final integration | Rafa | ✅ Done |
-| **Sat 2/7** | **Team Meeting @ 3PM** | All | 📅 |
+| Sat 2/7 | Team Meeting @ 3PM | All | ✅ Done |
 
-### Week 2: Feb 10-14 — SIEM & Testing
+### Week 1.5: Feb 8-9 — Node.js Migration & APM ✅
+
+| Day | Tasks | Owner | Status |
+|-----|-------|-------|--------|
+| Sat 2/8 | GitHub security automation, CI/CD | Rafa | ✅ Done |
+| Sun 2/9 | Node.js + dd-trace migration | Rafa | ✅ Done |
+| Sun 2/9 | Datadog APM integration (68+ spans) | Rafa | ✅ Done |
+| Sun 2/9 | Full API parity (50 endpoints) | Rafa | ✅ Done |
+| Sun 2/9 | Tech stack page redesign | Rafa | ✅ Done |
+
+### Week 2: Feb 10-14 (Current) — SIEM & Testing
 
 | Day | Tasks | Owner | Status |
 |-----|-------|-------|--------|
@@ -66,6 +79,8 @@
 | Wed 2/12 | Bastion host setup | Isaiah | ⏳ |
 | Thu 2/13 | IDS/IPS detection rules | Isaiah | ⏳ |
 | Fri 2/14 | **UAT Round 1** | All | ⏳ |
+
+> **Note:** Backend API is ready for UAT. All 50 endpoints functional with Datadog APM tracing.
 
 ### Week 3: Feb 17-21 — UAT & Documentation
 
