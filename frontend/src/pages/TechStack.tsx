@@ -24,93 +24,74 @@ mermaid.initialize({
   },
   flowchart: {
     curve: 'basis',
-    padding: 24,
-    nodeSpacing: 80,
-    rankSpacing: 100,
+    padding: 20,
+    nodeSpacing: 50,
+    rankSpacing: 60,
     htmlLabels: true
   }
 });
 
 const architectureDiagram = `
-flowchart LR
-    subgraph Internet["☁️ INTERNET"]
-        direction TB
+flowchart TD
+    subgraph Internet["☁️ CLOUDFLARE EDGE"]
+        direction LR
         User([👤 Users])
-        CF[Cloudflare<br/>CDN + WAF]
+        CF[CDN + WAF]
     end
 
-    subgraph Remote["🌐 REMOTE SITE"]
-        direction TB
-        RNode[Tailscale<br/>Node]
-    end
+    subgraph DC["🏢 HOMELAB — PA-220 NGFW (4 DMZ Zones)"]
+        direction LR
 
-    subgraph DC["🏢 PRIMARY DATACENTER"]
-        direction TB
-        
-        subgraph Core["CORE NETWORK"]
-            GW[Gateway<br/>Router]
-            DB[(PostgreSQL)]
+        subgraph MGMT["DMZ-MGMT · Pi0"]
+            DNS[DNS/AdGuard]
+            LDAP[LDAP]
         end
 
-        subgraph Firewall["🔥 NGFW"]
-            FW[Next-Gen<br/>Firewall]
+        subgraph Apps["DMZ-APPS · Pi2"]
+            direction TB
+            Tunnel[cloudflared Tunnel]
+            subgraph K3s["☸️ K3s"]
+                FE[📱 Frontend]
+                BE[⚡ Backend]
+                ML[🧠 ML Engine]
+            end
+            Wazuh[🛡️ Wazuh HIDS]
         end
 
-        subgraph MGMT["DMZ-MGMT"]
-            direction LR
-            DNS[DNS<br/>Server]
-            LDAP[Identity<br/>Provider]
-            Vector[Log<br/>Shipper]
-        end
-
-        subgraph Services["DMZ-MONITORING"]
-            Tunnel[Secure<br/>Tunnel]
+        subgraph Services["DMZ-SERVICES · Pi1"]
+            direction TB
+            DB[(PostgreSQL 17)]
             Graf[Grafana]
             Prom[Prometheus]
             Loki[Loki]
         end
 
-        subgraph Apps["DMZ-APPS"]
-            subgraph K3s["☸️ K3s Cluster"]
-                FE[📱 Frontend]
-                BE[⚡ Backend]
-                ML[🧠 ML Engine]
-            end
-        end
-
-        subgraph Security["DMZ-SECURITY"]
-            direction LR
-            IDS[🛡️ IDS/IPS]
-            SN[🕵️ Threat<br/>Detection]
+        subgraph Security["DMZ-SECURITY · RV2"]
+            IDS[Suricata IDS 74K rules]
         end
     end
 
-    User --> CF
-    CF --> Tunnel
-    
-    RNode <-.->|VPN Mesh| Tunnel
-    RNode -.-> Graf
-    
+    User --> CF --> Tunnel
     Tunnel --> FE
     FE --> BE
     BE --> ML
-    BE --> DB
-    
-    FW -.-> Vector
-    IDS -.-> Vector
-    Vector --> Loki
+    BE -->|Tailscale| DB
+    BE -.-> DNS
+
+    IDS -.->|EVE JSON| Loki
+    Wazuh -.-> Loki
+    BE -.-> Loki
+    Graf --- Prom
 
     classDef internet fill:#5e81ac,stroke:#4c566a,color:#eceff4
-    classDef remote fill:#88c0d0,stroke:#4c566a,color:#2e3440
     classDef infra fill:#d08770,stroke:#4c566a,color:#2e3440
     classDef app fill:#a3be8c,stroke:#4c566a,color:#2e3440
     classDef security fill:#bf616a,stroke:#4c566a,color:#eceff4
     classDef data fill:#b48ead,stroke:#4c566a,color:#2e3440
 
     class User,CF internet
-    class RNode remote
-    class GW,Tunnel,FW,DNS,LDAP,Vector,Graf,Prom,Loki infra
-    class FE,BE,ML,SN app
+    class DNS,LDAP,Tunnel,Graf,Prom,Loki infra
+    class FE,BE,ML,Wazuh app
     class IDS security
     class DB data
 `;
@@ -179,8 +160,8 @@ const techStack = {
     items: [
       { name: "FastAPI", desc: "Python async API framework" },
       { name: "scikit-learn", desc: "ML model training" },
-      { name: "GradientBoost", desc: "Price regression (R²=0.93)" },
-      { name: "RandomForest", desc: "Risk classification (81%)" },
+      { name: "GradientBoost", desc: "Price regression (R²=0.932)" },
+      { name: "HistGradientBoosting", desc: "Risk classification (86.8%)" },
       { name: "gRPC/Protobuf", desc: "Binary RPC protocol" },
     ]
   },
@@ -408,7 +389,7 @@ export default function TechStack() {
               System Architecture
             </h2>
             <a 
-              href="https://htmlpreview.github.io/?https://gist.githubusercontent.com/jag18729/968ce9b880b5d7164187fa9f1a29b9b8/raw/guardquote-architecture.html"
+              href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/jag18729/guard-quote/dev/docs/architecture/guardquote-architecture.html"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-emerald-400 transition-colors"
@@ -493,12 +474,12 @@ export default function TechStack() {
             <div>
               <h3 className="text-xl font-semibold mb-2">ML-Powered Pricing Engine</h3>
               <p className="text-zinc-400 mb-4">
-                Our ML engine uses GradientBoosting and RandomForest models trained on 500+ real security service quotes.
+                Our ML engine uses GradientBoosting and HistGradientBoosting models trained on 1,100 real security service quotes.
                 Backend communicates via gRPC for low-latency inference.
               </p>
               <div className="flex flex-wrap gap-3 text-sm">
-                <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full">R² = 0.93 (price prediction)</span>
-                <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full">81% accuracy (risk classification)</span>
+                <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full">R² = 0.932 (price prediction)</span>
+                <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full">86.8% accuracy (risk classification)</span>
                 <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full">&lt;50ms inference</span>
               </div>
             </div>
@@ -510,11 +491,11 @@ export default function TechStack() {
           <h2 className="text-2xl font-bold mb-8 text-center">Key Metrics</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
             {[
-              { value: "0.93", label: "ML R² Score" },
-              { value: "81%", label: "Risk Accuracy" },
+              { value: "0.932", label: "ML R² Score" },
+              { value: "86.8%", label: "Risk Accuracy" },
               { value: "$0", label: "Monthly Cost" },
               { value: "3", label: "OAuth Providers" },
-              { value: "48K", label: "IDS Rules" },
+              { value: "74K", label: "IDS Rules" },
               { value: "4", label: "FW Zones" },
               { value: "12ms", label: "Cold Start" },
             ].map((stat, i) => (
