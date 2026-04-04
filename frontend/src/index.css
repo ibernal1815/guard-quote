@@ -14,7 +14,7 @@ body {
 ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
 
 input:focus, select:focus, textarea:focus, button:focus {
-  outline: 2px solid #f97316;
+  outline: 2px solid #14b8a6;
   outline-offset: 2px;
 }
 
@@ -34,3 +34,39 @@ select option {
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+
+/* Concentric arc decorative lines — Figma-inspired corner accents */
+.arc-lines-tr {
+  position: absolute;
+  top: -120px;
+  right: -120px;
+  width: 400px;
+  height: 400px;
+  pointer-events: none;
+  z-index: 0;
+}
+.arc-lines-bl {
+  position: absolute;
+  bottom: -120px;
+  left: -120px;
+  width: 400px;
+  height: 400px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Glass card — Figma-style with teal left accent */
+.glass-card {
+  background: rgba(17, 17, 19, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(39, 39, 42, 0.8);
+  border-radius: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.glass-card:hover {
+  border-color: rgba(20, 184, 166, 0.25);
+  box-shadow: 0 0 24px rgba(20, 184, 166, 0.06);
+}
+.glass-card-accent {
+  border-left: 2px solid rgba(20, 184, 166, 0.5);
+}

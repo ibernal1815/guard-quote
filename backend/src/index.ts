@@ -39,6 +39,20 @@ app.use("*", cors());
 // HEALTH & INFO
 // ============================================
 
+// DB check with hard 3s deadline so health endpoints always respond fast
+async function dbCheck(timeoutMs = 3000): Promise<boolean> {
+  try {
+    return await Promise.race([
+      testConnection(),
+      new Promise<boolean>((_, reject) =>
+        setTimeout(() => reject(new Error("db timeout")), timeoutMs)
+      ),
+    ]);
+  } catch {
+    return false;
+  }
+}
+
 app.get("/", (c) =>
   c.json({
     status: "ok",
@@ -48,16 +62,21 @@ app.get("/", (c) =>
   })
 );
 
+// Lightweight liveness — no DB call, just proves process is alive
+app.get("/live", (c) => {
+  return c.json({ status: "alive", timestamp: new Date().toISOString() });
+});
+
 app.get("/health", async (c) => {
-  const dbOk = await testConnection();
-  
+  const dbOk = await dbCheck();
+
   // Clock sanity check (critical for JWT)
   const now = new Date();
   const year = now.getFullYear();
   const clockOk = year >= 2026 && year <= 2030;
-  
+
   const isHealthy = dbOk && clockOk;
-  
+
   return c.json({
     status: isHealthy ? "healthy" : "degraded",
     database: dbOk ? "connected" : "disconnected",
@@ -69,7 +88,7 @@ app.get("/health", async (c) => {
 app.get("/live", (c) => c.json({ status: "ok" }));
 
 app.get("/api/health", async (c) => {
-  const dbOk = await testConnection();
+  const dbOk = await dbCheck();
   return c.json({
     status: dbOk ? "healthy" : "degraded",
     database: dbOk ? "connected" : "disconnected",
@@ -393,10 +412,20 @@ app.get("/api/quotes/lookup", async (c) => {
     return c.json({ error: "Quote not found" }, 404);
   }
 
+  // Fetch status history for this quote
+  const history = await sql`
+    SELECT qsh.from_status, qsh.to_status, qsh.reason, qsh.changed_at
+    FROM quote_status_history qsh
+    JOIN quotes q ON qsh.quote_id = q.id
+    WHERE q.quote_number = ${number}
+    ORDER BY qsh.changed_at ASC
+  `;
+
   // Add a calculated valid_until (30 days from creation)
   const result = {
     ...quote[0],
     valid_until: new Date(new Date(quote[0].created_at).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    status_history: history,
   };
 
   return c.json(result);
@@ -1412,7 +1441,13 @@ app.get("/api/auth/callback/:provider", async (c) => {
   const returnUrl = tokenResult.returnUrl || "/admin";
   const separator = returnUrl.includes("?") ? "&" : "?";
   const redirectUrl = `${returnUrl}${separator}token=${accessToken}`;
-  console.log(`[OAuth] Redirecting to: ${redirectUrl.substring(0, 50)}...`);
+  // Log OAuth login to user_activity
+  const oauthIp = c.req.header("x-forwarded-for") || c.req.header("x-real-ip") || null;
+  await sql`
+    INSERT INTO user_activity (user_id, action, details, ip_address)
+    VALUES (${user.id}, 'login', ${JSON.stringify({ method: "oauth", provider })}::jsonb, ${oauthIp})
+  `.catch(() => {});
+  console.log(`[OAuth] Login: user=${user.email} provider=${provider}`);
   return c.redirect(redirectUrl);
 });
 
@@ -1809,16 +1844,22 @@ app.get("/api/admin/ml/status", async (c) => {
 
   try {
     const mlRes = await fetch(`${ML_ENGINE_URL}/api/v1/model-info`);
-    const mlInfo = await mlRes.json();
+    const mlInfo: Record<string, any> = await mlRes.json();
     const trainingCount = await sql`SELECT COUNT(*) as total, COUNT(DISTINCT event_type_code) as event_types, COUNT(DISTINCT state) as locations FROM ml_training_data`;
+    const version = mlInfo.version || "unknown";
+    const modelType = mlInfo.model_type || "unknown";
+    const lastTrained = mlInfo.last_trained || null;
+    const priceR2 = mlInfo.accuracy || 0;
+    const riskAcc = mlInfo.risk_accuracy || 0;
+    const trainingSamples = mlInfo.training_samples || 0;
     return c.json({
-      currentModel: { version: mlInfo.version || "unknown", type: mlInfo.model_type || "unknown", lastUpdated: mlInfo.last_trained || null, status: "active" },
-      trainingData: { totalRecords: parseInt(trainingCount[0].total) || 0, eventTypes: parseInt(trainingCount[0].event_types) || 0, locations: parseInt(trainingCount[0].locations) || 0 },
-      performance: { accuracy: mlInfo.accuracy || 0, avgConfidence: 0.92, predictionsToday: 0, avgResponseTime: "50ms" },
-      versions: [{ version: mlInfo.version || "unknown", type: mlInfo.model_type || "unknown", date: mlInfo.last_trained || null, active: true, accuracy: mlInfo.accuracy || 0 }],
+      currentModel: { version, type: modelType, lastUpdated: lastTrained, status: mlInfo.status === "loaded" ? "active" : "offline" },
+      trainingData: { totalRecords: parseInt(trainingCount[0].total) || 0, eventTypes: parseInt(trainingCount[0].event_types) || 0, locations: parseInt(trainingCount[0].locations) || 0, trainingSamples },
+      performance: { accuracy: priceR2, riskAccuracy: riskAcc, avgConfidence: 0.92, predictionsToday: 0, avgResponseTime: "50ms" },
+      versions: [{ version, type: modelType, date: lastTrained, active: true, accuracy: priceR2, riskAccuracy: riskAcc }],
     });
   } catch {
-    return c.json({ currentModel: { version: "unavailable", type: "unknown", lastUpdated: null, status: "offline" }, trainingData: { totalRecords: 0, eventTypes: 0, locations: 0 }, performance: { accuracy: 0, avgConfidence: 0, predictionsToday: 0, avgResponseTime: "N/A" }, versions: [] });
+    return c.json({ currentModel: { version: "unavailable", type: "unknown", lastUpdated: null, status: "offline" }, trainingData: { totalRecords: 0, eventTypes: 0, locations: 0 }, performance: { accuracy: 0, riskAccuracy: 0, avgConfidence: 0, predictionsToday: 0, avgResponseTime: "N/A" }, versions: [] });
   }
 });
 

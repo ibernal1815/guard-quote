@@ -9,7 +9,7 @@ export default function PublicLayout() {
   return (
     <div className="min-h-screen bg-zinc-950">
       {/* Masthead */}
-      <header className="sticky top-0 z-50 bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-800">
+      <header className="sticky top-0 z-50 bg-zinc-950/90 backdrop-blur-xl border-b border-teal-500/20">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 text-zinc-400 hover:text-white transition">
             <Shield className="w-6 h-6 text-accent" />
@@ -30,7 +30,7 @@ export default function PublicLayout() {
               Get Quote
             </Link>
             {user ? (
-              <Link to="/admin" className="ml-2 px-4 py-2 text-sm font-medium bg-accent hover:bg-orange-600 text-black rounded-lg transition">
+              <Link to="/admin" className="ml-2 px-4 py-2 text-sm font-medium bg-accent hover:bg-accent-dark text-black rounded-lg transition">
                 Dashboard
               </Link>
             ) : (
@@ -47,7 +47,7 @@ export default function PublicLayout() {
       </main>
       
       {/* Footer */}
-      <footer className="border-t border-zinc-800 py-12 mt-8">
+      <footer className="border-t border-zinc-800/60 py-12 mt-8">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>

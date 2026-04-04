@@ -96,60 +96,80 @@ export default function Landing() {
   
   return (
     <div className="relative">
-      {/* Hero glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-accent/10 blur-[120px] pointer-events-none" />
-      
+      {/* Hero ambient glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-teal-500/[0.07] blur-[100px] pointer-events-none" />
+
       {/* Hero */}
-      <section className="relative pt-20 pb-16 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-block mb-6 px-4 py-1.5 bg-accent/20 rounded text-accent text-xs font-mono font-medium tracking-wider">
-            AI-POWERED SECURITY PRICING
-          </div>
-          
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-            Get expert security<br />
-            <span className="text-accent">without the complexity.</span>
-          </h1>
-          
-          <p className="text-lg text-zinc-400 max-w-2xl mx-auto mb-10">
-            You focus on your business. We connect you with vetted security professionals 
-            who design, implement, and manage your protection — so you don't have to become an expert.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              to="/quote" 
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-accent hover:bg-orange-600 text-black font-semibold rounded-lg transition-all hover:scale-105 text-lg"
-            >
-              Get a Free Quote
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link 
-              to="/quote/lookup" 
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-zinc-700 hover:border-accent text-zinc-300 hover:text-accent font-medium rounded-lg transition-all text-lg"
-            >
-              <FileSearch className="w-5 h-5" />
-              Review a Past Quote
-            </Link>
-          </div>
-          
-          <p className="mt-6 text-sm text-zinc-500">
-            No commitment • Response within 24 hours • Transparent pricing
-          </p>
-          
-          {/* Quick actions for returning users */}
-          {user && (
-            <div className="mt-4 flex items-center justify-center gap-3 text-sm">
-              <span className="text-zinc-500">Welcome back —</span>
-              <Link to="/admin" className="text-accent hover:underline font-medium">Go to Dashboard</Link>
+      <section className="relative pt-20 pb-16 px-6 overflow-hidden">
+        {/* Concentric arc lines — top right */}
+        <svg className="arc-lines-tr" viewBox="0 0 400 400" fill="none">
+          {[160, 200, 240, 280, 320].map((r, i) => (
+            <circle key={i} cx="400" cy="0" r={r} stroke="rgba(20,184,166,0.12)" strokeWidth="0.75" />
+          ))}
+        </svg>
+
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12 relative z-10">
+          {/* Left — text */}
+          <div className="flex-1 text-center md:text-left">
+            <div className="inline-block mb-6 px-4 py-1.5 bg-accent/10 border border-accent/20 rounded text-accent text-xs font-mono font-medium tracking-wider">
+              AI-POWERED SECURITY PRICING
             </div>
-          )}
+
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
+              Get expert security<br />
+              <span className="text-accent">without the complexity.</span>
+            </h1>
+
+            <p className="text-lg text-zinc-400 max-w-2xl mb-10">
+              You focus on your business. We connect you with vetted security professionals
+              who design, implement, and manage your protection so you never have to become one yourself.
+            </p>
+
+            <div className="flex flex-row gap-3 justify-center md:justify-start">
+              <Link
+                to="/quote"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-accent hover:bg-accent-dark text-black font-semibold rounded-md transition-all hover:scale-105 text-sm whitespace-nowrap"
+              >
+                Get a Free Quote
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+              <Link
+                to="/quote/lookup"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 border border-zinc-700 hover:border-accent text-zinc-300 hover:text-accent font-medium rounded-md transition-all text-sm whitespace-nowrap"
+              >
+                <FileSearch className="w-3.5 h-3.5" />
+                Review a Past Quote
+              </Link>
+            </div>
+
+            <p className="mt-6 text-sm text-zinc-500">
+              No commitment • Response within 24 hours • Transparent pricing
+            </p>
+
+            {/* Quick actions for returning users */}
+            {user && (
+              <div className="mt-4 flex items-center justify-center md:justify-start gap-3 text-sm">
+                <span className="text-zinc-500">Welcome back!</span>
+                <Link to="/admin" className="text-accent hover:underline font-medium">Go to Dashboard</Link>
+              </div>
+            )}
+          </div>
+
+          {/* Right — 3D shield from Figma */}
+          <div className="hidden md:flex items-center justify-end flex-1 relative -mr-6 lg:-mr-12">
+            <div className="absolute inset-0 bg-teal-500/[0.06] blur-[80px] rounded-full" />
+            <img
+              src="/shield.png"
+              alt="Cybersecurity shield"
+              className="relative w-[700px] lg:w-[1020px] max-w-none h-auto drop-shadow-[0_0_40px_rgba(20,184,166,0.15)]"
+            />
+          </div>
         </div>
       </section>
 
       {/* Live Stats Bar */}
       {stats && (
-        <section className="py-8 px-6 bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 border-y border-zinc-700">
+        <section className="py-8 px-6 bg-gradient-to-r from-zinc-900 via-teal-950/30 to-zinc-900 border-y border-zinc-700">
           <div className="max-w-5xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               <div>
@@ -171,7 +191,7 @@ export default function Landing() {
                 <div className="text-sm text-zinc-400 mt-1">Clients Protected</div>
               </div>
               <div>
-                <div className="text-3xl md:text-4xl font-bold text-amber-400">
+                <div className="text-3xl md:text-4xl font-bold text-cyan-400">
                   {stats.satisfactionRate}%
                 </div>
                 <div className="text-sm text-zinc-400 mt-1">Satisfaction Rate</div>
@@ -202,7 +222,7 @@ export default function Landing() {
       {/* Did You Know? */}
       <section className="py-12 px-6">
         <div className="max-w-3xl mx-auto">
-          <div className="p-6 bg-gradient-to-br from-zinc-900 to-zinc-800 border border-zinc-700 rounded-xl relative overflow-hidden">
+          <div className="p-6 bg-gradient-to-br from-zinc-900 to-zinc-800 border border-zinc-700 hover:border-teal-500/30 rounded-xl relative overflow-hidden transition-colors">
             <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 blur-3xl" />
             <div className="relative flex items-start gap-4">
               <div className="shrink-0 w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center">
@@ -213,7 +233,7 @@ export default function Landing() {
                 <p className="text-lg text-zinc-200 font-medium mb-2 transition-all duration-500">
                   {fact.fact}
                 </p>
-                <p className="text-xs text-zinc-500">— {fact.source}</p>
+                <p className="text-xs text-zinc-500">Source: {fact.source}</p>
               </div>
             </div>
             {/* Fact navigation dots */}
@@ -233,37 +253,47 @@ export default function Landing() {
       </section>
 
       {/* Who it's for */}
-      <section className="py-20 px-6">
-        <div className="max-w-5xl mx-auto">
+      <section className="relative py-20 px-6 overflow-hidden">
+        {/* Concentric arc lines — bottom left */}
+        <svg className="arc-lines-bl" viewBox="0 0 400 400" fill="none">
+          {[160, 200, 240, 280, 320].map((r, i) => (
+            <circle key={i} cx="0" cy="400" r={r} stroke="rgba(20,184,166,0.08)" strokeWidth="0.75" />
+          ))}
+        </svg>
+
+        <div className="max-w-5xl mx-auto relative z-10">
           <div className="text-center mb-12">
+            <div className="text-accent text-xs font-mono tracking-wider mb-3 uppercase">Our Services</div>
             <h2 className="text-3xl font-bold mb-3">Built for people like you</h2>
-            <p className="text-zinc-400">No security background needed. We handle the complexity.</p>
+            <p className="text-zinc-400 max-w-xl mx-auto">No security background needed. We handle the complexity.</p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { 
-                icon: User, 
-                title: "Business Owners", 
+              {
+                icon: User,
+                title: "Business Owners",
                 desc: "Protect your store, office, or property without hiring a full security team. Get expert guidance tailored to your budget.",
                 examples: "Retail • Restaurants • Offices • Warehouses"
               },
-              { 
-                icon: Building2, 
-                title: "Event Planners", 
-                desc: "Corporate events, weddings, conferences — get professional security that keeps guests safe and lets you focus on the event.",
+              {
+                icon: Building2,
+                title: "Event Planners",
+                desc: "Corporate events, weddings, conferences. Get professional security that keeps guests safe and lets you focus on the event.",
                 examples: "Weddings • Conferences • Parties • Festivals"
               },
-              { 
-                icon: ShieldCheck, 
-                title: "Developers & Startups", 
-                desc: "Building an app or service? Our consultants help you design security that scales — from SOC2 prep to physical office security.",
+              {
+                icon: ShieldCheck,
+                title: "Developers & Startups",
+                desc: "Building an app or service? Our consultants help you design security that scales, from SOC2 prep to physical office security.",
                 examples: "Tech Startups • SaaS • Coworking • Data Centers"
               },
             ].map((card, i) => (
-              <div key={i} className="p-6 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-zinc-700 transition-all">
-                <card.icon className="w-10 h-10 text-accent mb-4" />
-                <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
+              <div key={i} className={`glass-card p-6 ${i === 0 ? "glass-card-accent" : ""}`}>
+                <div className="w-12 h-12 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center mb-4">
+                  <card.icon className="w-6 h-6 text-accent" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">{card.title}</h3>
                 <p className="text-zinc-400 text-sm mb-4">{card.desc}</p>
                 <p className="text-xs text-zinc-600">{card.examples}</p>
               </div>
@@ -273,8 +303,14 @@ export default function Landing() {
       </section>
 
       {/* How it works - simplified */}
-      <section className="py-20 px-6 bg-zinc-900/30 border-y border-zinc-800">
-        <div className="max-w-4xl mx-auto">
+      <section className="relative py-20 px-6 bg-zinc-900/30 border-y border-zinc-800 overflow-hidden">
+        {/* Concentric arc lines — top right */}
+        <svg className="arc-lines-tr" viewBox="0 0 400 400" fill="none">
+          {[180, 220, 260, 300].map((r, i) => (
+            <circle key={i} cx="400" cy="0" r={r} stroke="rgba(20,184,166,0.06)" strokeWidth="0.75" />
+          ))}
+        </svg>
+        <div className="max-w-4xl mx-auto relative z-10">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-3">How it works</h2>
             <p className="text-zinc-400">From quote to protection in three easy steps</p>
@@ -302,8 +338,8 @@ export default function Landing() {
               },
             ].map((step, i) => (
               <div key={i} className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/20 flex items-center justify-center">
-                  <step.icon className="w-7 h-7 text-accent" />
+                <div className="w-14 h-14 mx-auto mb-4 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center">
+                  <step.icon className="w-6 h-6 text-accent" />
                 </div>
                 <div className="text-sm text-accent font-mono mb-2">Step {step.num}</div>
                 <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
@@ -315,15 +351,15 @@ export default function Landing() {
           <div className="text-center mt-12 flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               to="/quote" 
-              className="inline-flex items-center gap-2 px-8 py-4 bg-accent hover:bg-orange-600 text-black font-semibold rounded-lg transition-all hover:scale-105"
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-accent hover:bg-accent-dark text-black font-semibold rounded-lg transition-all hover:scale-105 text-sm"
             >
-              Start Your Free Quote <ArrowRight className="w-5 h-5" />
+              Start Your Free Quote <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link 
-              to="/quote/lookup" 
-              className="inline-flex items-center gap-2 px-6 py-4 border border-zinc-700 hover:border-zinc-500 text-zinc-400 hover:text-white font-medium rounded-lg transition-all"
+            <Link
+              to="/quote/lookup"
+              className="inline-flex items-center gap-2 px-5 py-2.5 border border-zinc-700 hover:border-zinc-500 text-zinc-400 hover:text-white font-medium rounded-lg transition-all text-sm"
             >
-              <FileSearch className="w-5 h-5" />
+              <FileSearch className="w-4 h-4" />
               Look Up Existing Quote
             </Link>
           </div>
@@ -334,7 +370,7 @@ export default function Landing() {
       <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="p-8 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 border border-zinc-700 rounded-2xl relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(249,115,22,0.1),transparent_50%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(20,184,166,0.1),transparent_50%)]" />
             <div className="relative flex flex-col md:flex-row items-center gap-8">
               <div className="flex-1">
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-accent/20 rounded-full text-accent text-xs font-mono mb-4">
@@ -345,10 +381,10 @@ export default function Landing() {
                 <p className="text-zinc-400 mb-6">
                   GuardQuote uses machine learning to analyze risk factors and generate accurate pricing. 
                   Our GradientBoost model achieves 93% accuracy on historical security data. Built with 
-                  modern infrastructure: Bun, React, Kubernetes, and a distributed monitoring stack.
+                  modern infrastructure: Deno, Hono, React, and a distributed monitoring stack.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {["React 18", "Bun 1.3", "FastAPI", "PostgreSQL", "K3s", "Prometheus", "Grafana"].map((tech) => (
+                  {["React 18", "Deno 2.6", "Hono", "PostgreSQL 17", "K3s", "Prometheus", "Grafana"].map((tech) => (
                     <span key={tech} className="px-3 py-1 bg-zinc-800 border border-zinc-700 rounded-full text-xs text-zinc-300">
                       {tech}
                     </span>
@@ -411,7 +447,7 @@ export default function Landing() {
                 rating: 5
               },
             ].map((testimonial, i) => (
-              <div key={i} className="p-6 bg-zinc-900 border border-zinc-800 rounded-xl">
+              <div key={i} className="glass-card p-6">
                 <div className="flex gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, j) => (
                     <Star key={j} className="w-4 h-4 text-amber-400 fill-current" />
@@ -448,7 +484,7 @@ export default function Landing() {
               },
               {
                 q: "What if I'm not sure what I need?",
-                a: "That's exactly why we exist. Start with a free quote — our system will ask simple questions and recommend the right solution for your situation."
+                a: "That's exactly why we exist. Start with a free quote and our system will ask simple questions and recommend the right solution for your situation."
               },
               {
                 q: "Are your consultants actually vetted?",
@@ -456,10 +492,10 @@ export default function Landing() {
               },
               {
                 q: "How does pricing work?",
-                a: "You'll see transparent pricing upfront — no hidden fees, no surprises. Pay only for what you need, and rates are competitive with (or better than) hiring directly."
+                a: "You'll see transparent pricing upfront. No hidden fees, no surprises. Pay only for what you need, and rates are competitive with hiring directly."
               },
             ].map((faq, i) => (
-              <div key={i} className="p-5 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-zinc-700 transition-all">
+              <div key={i} className="glass-card p-5">
                 <h3 className="font-semibold mb-2">{faq.q}</h3>
                 <p className="text-zinc-400 text-sm">{faq.a}</p>
               </div>
@@ -469,14 +505,20 @@ export default function Landing() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 px-6 bg-gradient-to-b from-zinc-900/50 to-zinc-950">
-        <div className="max-w-3xl mx-auto text-center">
+      <section className="relative py-20 px-6 bg-gradient-to-b from-zinc-900/50 to-zinc-950 overflow-hidden">
+        {/* Concentric arc lines — bottom right */}
+        <svg className="absolute bottom-[-80px] right-[-80px] w-[300px] h-[300px] pointer-events-none" viewBox="0 0 300 300" fill="none">
+          {[120, 150, 180, 210].map((r, i) => (
+            <circle key={i} cx="300" cy="300" r={r} stroke="rgba(20,184,166,0.08)" strokeWidth="0.75" />
+          ))}
+        </svg>
+        <div className="max-w-3xl mx-auto text-center relative z-10">
           <h2 className="text-3xl font-bold mb-4">Ready to protect what matters?</h2>
           <p className="text-zinc-400 mb-8">Get a free quote in under 2 minutes. No commitment, no pressure.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               to="/quote" 
-              className="inline-flex items-center gap-2 px-10 py-5 bg-accent hover:bg-orange-600 text-black font-semibold rounded-lg transition-all hover:scale-105 text-lg"
+              className="inline-flex items-center gap-2 px-8 py-3 bg-accent hover:bg-accent-dark text-black font-semibold rounded-lg transition-all hover:scale-105 text-base"
             >
               Get Your Free Quote <ArrowRight className="w-5 h-5" />
             </Link>
