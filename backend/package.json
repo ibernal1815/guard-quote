@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
-    "@types/node": "^25.5.0",
+    "@types/node": "^25.5.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
@@ -23,9 +23,9 @@
     "@hono/node-server": "^1.19.12",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
-    "hono": "^4.12.9",
+    "hono": "^4.12.11",
     "postgres": "3.3.5",
-    "resend": "^6.9.4"
+    "resend": "^6.10.0"
   },
   "engines": {
     "node": ">=22.0.0"

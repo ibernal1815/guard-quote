@@ -2,7 +2,7 @@
 
 Welcome to the GuardQuote project! This guide will help you get set up and start contributing.
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Clone the Repository
 
@@ -36,17 +36,26 @@ npm run dev
 # Opens at http://localhost:5173
 ```
 
-### 4. Backend Setup (Deno)
+### 4. Backend Setup
 
-The backend runs on pi1. For local development:
+The backend runs on Hono. Local development uses Node + tsx for hot reload; production builds with Bun and ships to K3s on Pi2 via CI/CD on every push to main.
 
 ```bash
-cd backend  # If exists, or work directly on pi1
-deno run -A server.ts
+cd backend
+npm install
+npm run dev
 # API at http://localhost:3002
 ```
 
-## 📁 Project Structure
+Type-check before committing:
+
+```bash
+npm run typecheck
+```
+
+You do not need to deploy by hand. Pushing to `main` triggers the GitHub Actions self-hosted runner on Pi2, which builds the Bun container image and rolls the K3s deployment.
+
+## Project Structure
 
 ```
 guard-quote/
@@ -63,7 +72,7 @@ guard-quote/
 └── README.md
 ```
 
-## 🔧 Development Workflow
+## Development Workflow
 
 ### Making Changes
 
@@ -95,7 +104,7 @@ git push origin feature/your-feature-name
 
 Then create a Pull Request on GitHub.
 
-## 🌐 Architecture Overview
+## Architecture Overview
 
 ### Data Pipeline (SIEM Integration)
 
@@ -119,14 +128,15 @@ Then create a Pull Request on GitHub.
 
 | Service | Host | Port | Purpose |
 |---------|------|------|---------|
-| GuardQuote API | pi1 | 3002 | Backend API |
+| GuardQuote API (dev) | localhost | 3002 | Backend API for local dev |
+| GuardQuote API (prod) | Pi2 K3s | internal | Bun container, ingressed via cloudflared |
 | Grafana | pi1 | 3000 | Metrics dashboards |
 | Prometheus | pi1 | 9090 | Metrics storage |
 | Loki | pi1 | 3100 | Log aggregation |
 | Vector | pi0 | - | Log collection |
 | LDAP | pi0 | 389 | Authentication |
 
-## 🔐 Access & Credentials
+## Access & Credentials
 
 Contact the team lead (Rafa) for:
 - SSH access to pi0/pi1
@@ -142,7 +152,7 @@ ssh rafaeljg@[tailscale-ip]    # pi0
 ssh johnmarston@[tailscale-ip]  # pi1
 ```
 
-## 📋 Current Tasks
+## Current Tasks
 
 Check the [GitHub Project Board](https://github.com/users/jag18729/projects/1) for:
 - Open issues
@@ -156,7 +166,7 @@ Check the [GitHub Project Board](https://github.com/users/jag18729/projects/1) f
 3. **Network Visualization** - Interactive data flow diagrams
 4. **API Improvements** - New endpoints, optimization
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Frontend type checking
@@ -166,14 +176,14 @@ npm run typecheck
 npm run build
 ```
 
-## 📖 Documentation
+## Documentation
 
 - **Network Topology**: `/admin/network` in the dashboard
 - **Data Pipeline**: `/admin/network` → Data Pipeline tab
 - **API Docs**: See `docs/` folder
 - **SIEM Setup**: See `docs/WAZUH-INTEGRATION.md`
 
-## ❓ Getting Help
+## Getting Help
 
 - **Slack/Discord**: Team channel
 - **GitHub Issues**: For bugs and features
@@ -181,4 +191,4 @@ npm run build
 
 ---
 
-Happy coding! 🚀
+Happy coding!

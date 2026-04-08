@@ -1,7 +1,7 @@
-# GuardQuote v2.0 — Production Deployment
+# GuardQuote v2.0, Production Deployment
 
-**Status:** ✅ LIVE  
-**Date:** 2026-02-25  
+**Status:** LIVE
+**Date:** 2026-04-07
 **URL:** https://guardquote.vandine.us
 
 ---
@@ -16,14 +16,14 @@ Cloudflare Tunnel (vandine-tunnel)
     │
     ▼ guardquote.vandine.us
 ┌─────────────────────────────────────────────────────────────────┐
-│ pi1 (192.168.20.10) — Tunnel Ingress                           │
+│ pi1 (192.168.20.10), Tunnel Ingress                           │
 │                                                                 │
 │  cloudflared → Tailscale (100.111.113.35:30522)                │
 └─────────────────────────────────────────────────────────────────┘
     │
     ▼ Tailscale mesh
 ┌─────────────────────────────────────────────────────────────────┐
-│ pi2 (192.168.22.10 / 100.111.113.35) — K3s                     │
+│ pi2 (192.168.22.10 / 100.111.113.35), K3s                     │
 │                                                                 │
 │  ┌─────────────────────┐   ┌─────────────────────┐             │
 │  │ guardquote-frontend │   │ guardquote-backend  │             │
@@ -65,12 +65,12 @@ Cloudflare Tunnel (vandine-tunnel)
   - ML-powered pricing via gRPC
   - DEMO_MODE for showcase
 - **Routes:**
-  - `/api/auth/login/:provider` — OAuth initiation
-  - `/api/auth/callback/:provider` — OAuth callback
-  - `/api/auth/providers` — List available providers
-  - `/api/quotes/*` — Quote CRUD
-  - `/api/pricing/predict` — ML prediction
-  - `/health`, `/api/health` — Health checks
+  - `/api/auth/login/:provider`, OAuth initiation
+  - `/api/auth/callback/:provider`, OAuth callback
+  - `/api/auth/providers`, List available providers
+  - `/api/quotes/*`, Quote CRUD
+  - `/api/pricing/predict`, ML prediction
+  - `/health`, `/api/health`, Health checks
 
 ### ML Engine (`guardquote-ml:v2.1`)
 - **Image:** python:3.12 + FastAPI + sklearn
@@ -79,9 +79,9 @@ Cloudflare Tunnel (vandine-tunnel)
   - Price prediction: GradientBoost (R² = 0.93)
   - Risk classification: RandomForest (81%)
 - **Endpoints:**
-  - `/health`, `/api/v1/health` — Health checks
-  - `/api/v1/model-info` — Model metadata
-  - `/api/v1/predict` — REST prediction
+  - `/health`, `/api/v1/health`, Health checks
+  - `/api/v1/model-info`, Model metadata
+  - `/api/v1/predict`, REST prediction
 
 ---
 
@@ -242,6 +242,6 @@ Backend automatically uses rule-based pricing if ML engine is down.
 
 | Date | Version | Change |
 |------|---------|--------|
-| 2026-02-25 | v3.3 | OAuth URL fix, production deployment |
+| 2026-04-07 | v3.3 | OAuth URL fix, production deployment |
 | 2026-02-24 | v2-oauth | OAuth SSO, ML integration |
 | 2026-02-20 | v2.1 | DEMO_MODE, trained ML models |

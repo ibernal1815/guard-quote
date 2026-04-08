@@ -1,13 +1,13 @@
-# Hardware Integration Plan — Orange Pi RV2 + SN580 NVMe + Pi3
+# Hardware Integration Plan, Orange Pi RV2 + SN580 NVMe + Pi3
 
 > **Status**: Planning
-> **Last updated**: 2026-02-18
+> **Last updated**: 2026-04-07
 
 ---
 
 ## Hardware Inventory
 
-### Orange Pi RV2 (8GB) — NEW
+### Orange Pi RV2 (8GB), NEW
 
 | Spec | Value |
 |------|-------|
@@ -20,11 +20,11 @@
 | **Display** | Dual HDMI out |
 | **OS** | Ubuntu 24.04 (official), headless server image available |
 | **Price** | ~$64 USD |
-| **Architecture** | RISC-V 64-bit (rv64gc) — **NOT ARM64** |
+| **Architecture** | RISC-V 64-bit (rv64gc), **NOT ARM64** |
 
 **Key consideration**: This is RISC-V, not ARM. Most Docker images and binaries we use (Bun, Python wheels, K3s) are built for ARM64 or x86. RISC-V support is growing but not universal. This affects what we can run on it.
 
-### WD Blue SN580 NVMe (500GB) — NEW
+### WD Blue SN580 NVMe (500GB), NEW
 
 | Spec | Value |
 |------|-------|
@@ -34,9 +34,9 @@
 | **Write** | Up to 4,150 MB/s |
 | **Form factor** | M.2 2230 |
 
-**Perfect match**: The Orange Pi RV2 has an M.2 2230 slot. The SN580 is 2230 form factor. This gives the Orange Pi fast NVMe storage — massively better than microSD.
+**Perfect match**: The Orange Pi RV2 has an M.2 2230 slot. The SN580 is 2230 form factor. This gives the Orange Pi fast NVMe storage, massively better than microSD.
 
-### Pi3 (2GB Raspberry Pi) — EXISTING PLAN
+### Pi3 (2GB Raspberry Pi), EXISTING PLAN
 
 Already planned in `docs/PI3-PLAN.md`. Going to mom's house as off-site monitoring node.
 
@@ -47,7 +47,7 @@ Already planned in `docs/PI3-PLAN.md`. Going to mom's house as off-site monitori
 | **Storage** | microSD |
 | **Location** | Mom's house (remote, behind vandine-fw) |
 | **Connectivity** | WireGuard + Tailscale |
-| **Constraint** | No Docker — too tight on 2GB. Everything systemd-native. |
+| **Constraint** | No Docker, too tight on 2GB. Everything systemd-native. |
 
 ---
 
@@ -57,33 +57,33 @@ Already planned in `docs/PI3-PLAN.md`. Going to mom's house as off-site monitori
 
 ```
 Studio (Reveal SOHO):
-├── ThinkStation ([see .env]) — WSL2, OpenClaw gateway
-├── PA-220 reveal-fw ([see .env]) — firewall
-├── UDM ([see .env]) — gateway/router
-├── pi0 ([see .env]) — DNS, identity, log shipping, SNMP
-├── pi1 ([see .env]) — Grafana, Prometheus, Loki
-├── pi2 ([see .env]) — K3s workloads, security stack
-├── Orange Pi RV2 — ??? (to be planned)
-└── PostgreSQL host ([see .env]) — ??? (status unclear, needs recovery)
+├── ThinkStation ([see .env]), WSL2, OpenClaw gateway
+├── PA-220 reveal-fw ([see .env]), firewall
+├── UDM ([see .env]), gateway/router
+├── pi0 ([see .env]), DNS, identity, log shipping, SNMP
+├── pi1 ([see .env]), Grafana, Prometheus, Loki
+├── pi2 ([see .env]), K3s workloads, security stack
+├── Orange Pi RV2, ??? (to be planned)
+└── PostgreSQL host ([see .env]), ??? (status unclear, needs recovery)
 
 Mom's House (Vandine):
-├── PA-220 vandine-fw ([see .env]) — unreachable
-├── pi3 (2GB) — off-site monitoring (planned)
-└── UniFi APs + switch — offline
+├── PA-220 vandine-fw ([see .env]), unreachable
+├── pi3 (2GB), off-site monitoring (planned)
+└── UniFi APs + switch, offline
 ```
 
 ### Proposed Roles
 
 #### Orange Pi RV2 + SN580: **PostgreSQL Database Server**
 
-**The case for this**: The current PostgreSQL host ([see .env]) has unclear status — unreachable from pi2, needs recovery from backups, and needs to move onto the matrix network. Instead of fighting with an unstable host, deploy the Orange Pi RV2 as a dedicated database server.
+**The case for this**: The current PostgreSQL host ([see .env]) has unclear status, unreachable from pi2, needs recovery from backups, and needs to move onto the matrix network. Instead of fighting with an unstable host, deploy the Orange Pi RV2 as a dedicated database server.
 
 **Why it fits**:
-- **8GB RAM** — PostgreSQL loves RAM for shared_buffers and OS cache. 8GB is generous for our DB sizes (GuardQuote + MarketPulse are small).
-- **500GB NVMe** — Fast storage for DB I/O. PCIe Gen 4 is wildly overkill for our workload, but it means the DB will never be I/O bound.
-- **Dual Gigabit Ethernet** — One for the matrix network, one for management/backup. Or bond for redundancy.
-- **Low power** — Always-on DB server that sips power.
-- **2 TOPS NPU** — Could potentially accelerate ML inference in the future (experimental, RISC-V ML ecosystem is immature).
+- **8GB RAM**, PostgreSQL loves RAM for shared_buffers and OS cache. 8GB is generous for our DB sizes (GuardQuote + MarketPulse are small).
+- **500GB NVMe**, Fast storage for DB I/O. PCIe Gen 4 is wildly overkill for our workload, but it means the DB will never be I/O bound.
+- **Dual Gigabit Ethernet**, One for the matrix network, one for management/backup. Or bond for redundancy.
+- **Low power**, Always-on DB server that sips power.
+- **2 TOPS NPU**, Could potentially accelerate ML inference in the future (experimental, RISC-V ML ecosystem is immature).
 
 **The risk**: RISC-V software compatibility. PostgreSQL itself compiles fine for RISC-V and Ubuntu 24.04 includes it in apt. But:
 - Need to verify: `apt install postgresql-16` works on Orange Pi RV2 Ubuntu 24.04
@@ -117,7 +117,7 @@ Option C: Dedicated zone (lab)
 Option D: On main LAN ([see .env]x)
   IP: [see .env] (replace the old host)
   Zone: untrust (via UDM)
-  Pro: No PA-220 changes needed — existing allow-guardquote-db rule already targets [see .env]
+  Pro: No PA-220 changes needed, existing allow-guardquote-db rule already targets [see .env]
   Con: DB on the untrust zone is not ideal security-wise
 ```
 
@@ -147,11 +147,9 @@ No changes to `PI3-PLAN.md`. Roles:
 4. Secondary DNS (AdGuard Home)
 5. Wazuh agent
 
-**SDPS context**: Pi3 could also run a **lightweight GuardQuote demo endpoint** if we build the demo mode correctly. A static demo (pre-rendered quotes, no live DB) could serve from a simple HTTP server on pi3, showing SDPS judges the product works even from a remote location. But this is a stretch goal — the primary demo should run on pi2 K3s.
-
 ---
 
-## Orange Pi RV2 — Software Stack
+## Orange Pi RV2, Software Stack
 
 ### What it runs
 
@@ -192,7 +190,7 @@ checkpoint_completion_target = 0.9
 random_page_cost = 1.1          # NVMe is nearly sequential
 effective_io_concurrency = 200  # NVMe can handle parallel I/O
 
-# pg_hba.conf — who can connect
+# pg_hba.conf, who can connect
 # Local
 local   all    all    trust
 # Studio matrix network
@@ -217,21 +215,15 @@ host    all    all    10.7.7.0/24        md5    # WireGuard tunnel
 
 ---
 
-## Pi3 (2GB) — Updated Context for SDPS
+## Pi3 (2GB), Remote Monitoring Node
 
-### Demo Mode Support
+### Distributed Architecture Story
 
-For the Senior Design Project Showcase (deadline: March 3, 2026), pi3 could serve as a **proof of distributed architecture**:
+Pi3 sits off-site as proof that the platform runs across three physical locations: the main application on a Raspberry Pi 5, the database on a RISC-V Orange Pi, and a remote monitoring probe connected via WireGuard.
 
-"Our security quoting platform runs across three physical nodes — the main application on a Raspberry Pi 5, the database on a RISC-V Orange Pi, and a remote monitoring probe at an off-site location connected via WireGuard VPN."
+To support this, Pi3 runs a lightweight status dashboard (static HTML served by nginx or python3 http.server) showing WireGuard tunnel status, last heartbeat from the studio, and off-site network health. Total RAM is roughly 85MB for the static site server, node_exporter, and Vector.
 
-That's a compelling story for industry judges. To support it:
-
-- Pi3 runs a **lightweight status dashboard** (static HTML served by nginx or python3 http.server)
-- Shows: WireGuard tunnel status, last heartbeat from studio, off-site network health
-- Total RAM: ~20MB for a static site server + node_exporter + Vector ≈ 85MB
-
-### Memory Budget (Revised for SDPS)
+### Memory Budget
 
 | Service | RAM | Priority |
 |---------|-----|----------|
@@ -241,7 +233,7 @@ That's a compelling story for industry judges. To support it:
 | node_exporter | 15MB | Required |
 | Vector (minimal) | 50MB | Required |
 | blackbox exporter | 20MB | Required |
-| nginx (static demo) | 5MB | SDPS |
+| nginx (static demo) | 5MB | Optional |
 | **Total** | **345MB** | |
 | Available for OS cache | ~1.6GB | |
 
@@ -257,8 +249,8 @@ Depending on Orange Pi placement:
 
 **If Option B (dmz-security, [see .env])**:
 - Modify existing `allow-guardquote-db` rule: change destination from `[see .env]` to `[see .env]`
-- Actually — K3s pods on pi2 and the Orange Pi would be on the SAME zone (dmz-security). **No PA-220 rule needed for app→DB traffic** — it stays within the zone.
-- New rule needed: `allow-monitoring-db` — pi1 (dmz-services) → Orange Pi (dmz-security) : TCP 9100 (node_exporter), TCP 5432 (postgres-exporter)
+- Actually, K3s pods on pi2 and the Orange Pi would be on the SAME zone (dmz-security). **No PA-220 rule needed for app→DB traffic**, it stays within the zone.
+- New rule needed: `allow-monitoring-db`, pi1 (dmz-services) → Orange Pi (dmz-security) : TCP 9100 (node_exporter), TCP 5432 (postgres-exporter)
 
 **If Option D (main LAN, [see .env])**:
 - Existing `allow-guardquote-db` rule already works (targets [see .env]:5432)
